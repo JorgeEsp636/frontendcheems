@@ -9,14 +9,35 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   const handleLogin = (credentials) => {
-    // Simular autenticación
-    setUser({ email: credentials.email });
-    setCurrentView('dashboard');
+    // Validar credenciales del administrador
+    if (credentials.email === 'jorgemoreno062006@gmail.com' && credentials.password === '12345678') {
+      const authenticatedUser = {
+        email: credentials.email,
+        role: 'admin'
+      };
+      setUser(authenticatedUser);
+      alert('Has iniciado sesión como Administrador');
+      setCurrentView('dashboard');
+    } else {
+      // Permitir el inicio de sesión para cualquier otro usuario registrado (simulación)
+      const authenticatedUser = {
+        email: credentials.email,
+        role: 'user'
+      };
+      setUser(authenticatedUser);
+      alert('Has iniciado sesión como Usuario');
+      setCurrentView('dashboard');
+    }
   };
 
   const handleRegister = (credentials) => {
-    // Simular registro
-    setUser({ email: credentials.email });
+    // Registrar siempre como usuario normal
+    const registeredUser = {
+      email: credentials.email,
+      role: 'user' // Asegurarse de que siempre se registre como 'user'
+    };
+    setUser(registeredUser);
+    alert('Te has registrado y has iniciado sesión como Usuario');
     setCurrentView('dashboard');
   };
 

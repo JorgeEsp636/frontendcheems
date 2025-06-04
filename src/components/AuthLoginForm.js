@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('user');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin({ email, password });
+    onLogin({ email, password, role });
   };
 
   return (
