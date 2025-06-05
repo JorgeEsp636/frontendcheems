@@ -1,67 +1,72 @@
+import axiosInstance from './axiosConfig';
+
 const ADMIN_CREDENTIALS = {
     email: 'jorgemoreno062006@gmail.com',
     password: '12345678'
 };
 
-export const login = async (email, password) => {
-    console.log('Login attempt:', { email, password });
-    console.log('Admin credentials:', ADMIN_CREDENTIALS);
+const authService = {
+    // Iniciar sesión
+    login: async (email, password) => {
+        try {
+            const response = await axiosInstance.post('/token/', {
+                correo_electronico: email,
+                contrasena: password
+            });
+            
+            if (response.data.access) {
+                localStorage.setItem('token', response.data.access);
+                localStorage.setItem('refreshToken', response.data.refresh);
+                
+                // Obtener información del usuario
+                const userResponse = await axiosInstance.get('/usuarios/me/');
+                const userData = userResponse.data;
+                
+                // Guardar información del usuario
+                localStorage.setItem('userName', userData.nombre);
+                localStorage.setItem('userRole', userData.rol_nombre);
+            }
+            
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Error al iniciar sesión' };
+        }
+    },
 
-    // Verificar si es el administrador
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        console.log('Login exitoso como administrador');
-        return {
-            email: email,
-            name: 'Administrador',
-            username: 'Administrador',
-            role: 'admin'
-        };
-    }
-    
-    // Para otros usuarios, permitir cualquier email/contraseña
-    if (email && password) {
-        console.log('Login exitoso como usuario normal');
-        return {
-            email: email,
-            name: email.split('@')[0],
-            username: email.split('@')[0],
-            role: 'user'
-        };
-    }
+    // Registrar usuario
+    register: async (userData) => {
+        try {
+            const response = await axiosInstance.post('/registro/', {
+                correo_electronico: userData.correo_electronico,
+                nombre: userData.nombre,
+                contrasena: userData.contrasena
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Error al registrar usuario' };
+        }
+    },
 
-    console.log('Login fallido');
-    throw new Error('Credenciales inválidas');
+    // Cerrar sesión
+    logout: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRole');
+    },
+
+    // Verificar si el usuario está autenticado
+    isAuthenticated: () => {
+        return !!localStorage.getItem('token');
+    },
+
+    // Obtener el token actual
+    getToken: () => {
+        return localStorage.getItem('token');
+    }
 };
 
-export const register = async (userData) => {
-    console.log('Register attempt:', userData);
-
-    // No permitir registro con el email del administrador
-    if (userData.email === ADMIN_CREDENTIALS.email) {
-        throw new Error('Este correo electrónico no está disponible');
-    }
-    
-    // Validar que los campos requeridos estén presentes
-    if (!userData.email || !userData.username || !userData.password) {
-        throw new Error('Todos los campos son requeridos');
-    }
-
-    console.log('Registro exitoso');
-    return {
-        email: userData.email,
-        name: userData.username,
-        username: userData.username,
-        role: 'user'
-    };
-};
-
-export const logout = () => {
-    console.log('Logout');
-};
-
-export const isAuthenticated = () => {
-    return true;
-};
+export default authService;
 
 export const isAdmin = (user) => {
     return user && user.role === 'admin';
