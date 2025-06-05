@@ -72,9 +72,11 @@ const DriverInfo = ({ drivers, isAdmin }) => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Bus Asignado
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Acciones
-              </th>
+              {isAdmin && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Acciones
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -108,16 +110,16 @@ const DriverInfo = ({ drivers, isAdmin }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {driver.busInfo.number} - {driver.busInfo.model}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingDriver?.driverId === driver.driverId ? (
-                    <button
-                      onClick={handleSave}
-                      className="text-green-600 hover:text-green-900 mr-2"
-                    >
-                      Guardar
-                    </button>
-                  ) : (
-                    isAdmin && (
+                {isAdmin && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingDriver?.driverId === driver.driverId ? (
+                      <button
+                        onClick={handleSave}
+                        className="text-green-600 hover:text-green-900 mr-2"
+                      >
+                        Guardar
+                      </button>
+                    ) : (
                       <>
                         <button
                           onClick={() => handleEdit(driver)}
@@ -132,9 +134,9 @@ const DriverInfo = ({ drivers, isAdmin }) => {
                           Eliminar
                         </button>
                       </>
-                    )
-                  )}
-                </td>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

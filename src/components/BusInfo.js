@@ -73,9 +73,11 @@ const BusInfo = ({ buses, isAdmin }) => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Último Mantenimiento
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Acciones
-              </th>
+              {isAdmin && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Acciones
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -162,16 +164,16 @@ const BusInfo = ({ buses, isAdmin }) => {
                     new Date(bus.lastMaintenance).toLocaleDateString()
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingBus?.number === bus.number ? (
-                    <button
-                      onClick={handleSave}
-                      className="text-green-600 hover:text-green-900 mr-2"
-                    >
-                      Guardar
-                    </button>
-                  ) : (
-                    isAdmin && (
+                {isAdmin && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingBus?.number === bus.number ? (
+                      <button
+                        onClick={handleSave}
+                        className="text-green-600 hover:text-green-900 mr-2"
+                      >
+                        Guardar
+                      </button>
+                    ) : (
                       <>
                         <button
                           onClick={() => handleEdit(bus)}
@@ -186,9 +188,9 @@ const BusInfo = ({ buses, isAdmin }) => {
                           Eliminar
                         </button>
                       </>
-                    )
-                  )}
-                </td>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

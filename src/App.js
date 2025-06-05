@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import TransportDashboard from './components/TransportDashboard';
 import { login, register, logout } from './services/authService';
+import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -45,6 +46,7 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Routes>
         <Route path="/register" element={<Register onRegister={handleRegister} error={error} />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route 
           path="*" 
           element={

@@ -254,9 +254,9 @@ const TransportDashboard = ({ user, onLogout }) => {
                 </button>
                 {isAdmin && (
                   <button
-                    onClick={() => setActiveTab('pqrs')}
+                    onClick={() => setActiveTab('pqrsList')}
                     className={`${
-                      activeTab === 'pqrs'
+                      activeTab === 'pqrsList'
                         ? 'border-indigo-500 text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
@@ -266,9 +266,9 @@ const TransportDashboard = ({ user, onLogout }) => {
                 )}
                 {!isAdmin && (
                   <button
-                    onClick={() => setActiveTab('pqrs-form')}
+                    onClick={() => setActiveTab('pqrsForm')}
                     className={`${
-                      activeTab === 'pqrs-form'
+                      activeTab === 'pqrsForm'
                         ? 'border-indigo-500 text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
@@ -386,10 +386,10 @@ const TransportDashboard = ({ user, onLogout }) => {
         {activeTab === 'buses' && (
           <BusInfo buses={driverBusData.map(d => d.busInfo)} isAdmin={isAdmin} />
         )}
-        {activeTab === 'pqrs' && isAdmin && (
+        {activeTab === 'pqrsList' && isAdmin && (
           <PqrsList pqrs={pqrsList} isAdmin={isAdmin} />
         )}
-        {activeTab === 'pqrs-form' && !isAdmin && (
+        {activeTab === 'pqrsForm' && !isAdmin && (
           <PqrsForm onSubmit={handleAddPqrs} />
         )}
       </main>

@@ -86,6 +86,13 @@ const Login = ({ onLogin, error, registrationSuccess, setRegistrationSuccess }) 
               ¿No tienes cuenta? Regístrate
             </Link>
           </div>
+
+          {/* Link de Olvidé mi contraseña */}
+          <div className="text-sm text-center mt-2">
+            <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
         </form>
       </div>
     </div>
