@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
+import authService from '../services/authService';
 
 const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin({ email, password, role });
+    setError('');
+    try {
+      const response = await authService.login(email, password);
+      onLogin({ email, role: response.role || 'user' });
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión');
+    }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+      {error && (
+        <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Email</label>

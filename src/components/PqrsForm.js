@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 
-const PqrsForm = () => {
+const PqrsForm = ({ onSubmit }) => {
   const [requestType, setRequestType] = useState('Petición');
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar el envío del formulario, por ejemplo, enviarlo a un backend
-    console.log('Enviando PQRS:', { requestType, message });
-    alert('Tu PQRS ha sido enviada.');
+    onSubmit({
+      type: requestType,
+      message: message,
+      date: new Date().toISOString(),
+      status: 'Pendiente'
+    });
     // Reiniciar el formulario
     setRequestType('Petición');
     setMessage('');

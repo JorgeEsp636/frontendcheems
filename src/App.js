@@ -1,84 +1,67 @@
 import React, { useState } from 'react';
-import AuthLoginForm from './components/AuthLoginForm';
-import AuthRegisterForm from './components/AuthRegisterForm';
-import AuthForgotPassword from './components/AuthForgotPassword';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
 import TransportDashboard from './components/TransportDashboard';
+import { login, register, logout } from './services/authService';
 
-const App = () => {
-  const [currentView, setCurrentView] = useState('login');
+function App() {
   const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
 
-  const handleLogin = (credentials) => {
-    // Validar credenciales del administrador
-    if (credentials.email === 'jorgemoreno062006@gmail.com' && credentials.password === '12345678') {
-      const authenticatedUser = {
-        email: credentials.email,
-        role: 'admin'
-      };
-      setUser(authenticatedUser);
-      alert('Has iniciado sesión como Administrador');
-      setCurrentView('dashboard');
-    } else {
-      // Permitir el inicio de sesión para cualquier otro usuario registrado (simulación)
-      const authenticatedUser = {
-        email: credentials.email,
-        role: 'user'
-      };
-      setUser(authenticatedUser);
-      alert('Has iniciado sesión como Usuario');
-      setCurrentView('dashboard');
+  const handleLogin = async (email, password) => {
+    try {
+      const userData = await login(email, password);
+      console.log('Login successful:', userData);
+      setUser(userData);
+      setError('');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Credenciales inválidas');
     }
   };
 
-  const handleRegister = (credentials) => {
-    // Registrar siempre como usuario normal
-    const registeredUser = {
-      email: credentials.email,
-      role: 'user' // Asegurarse de que siempre se registre como 'user'
-    };
-    setUser(registeredUser);
-    alert('Te has registrado y has iniciado sesión como Usuario');
-    setCurrentView('dashboard');
-  };
-
-  const handleResetPassword = (email) => {
-    // Simular recuperación de contraseña
-    alert(`Se han enviado instrucciones a ${email}`);
-    setCurrentView('login');
+  const handleRegister = async (userData) => {
+    try {
+      const newUser = await register(userData);
+      console.log('Register successful:', newUser);
+      setUser(newUser);
+      setError('');
+    } catch (err) {
+      console.error('Register error:', err);
+      setError('Error al registrar usuario');
+    }
   };
 
   const handleLogout = () => {
+    logout();
     setUser(null);
-    setCurrentView('login');
   };
 
+  if (!user) {
+    return (
+      <Router>
+        <div className="min-h-screen bg-gray-100">
+          <Routes>
+            <Route path="/register" element={<Register onRegister={handleRegister} error={error} />} />
+            <Route path="*" element={<Login onLogin={handleLogin} error={error} />} />
+          </Routes>
+        </div>
+      </Router>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      {currentView === 'login' && (
-        <AuthLoginForm
-          onLogin={handleLogin}
-          onForgotPassword={() => setCurrentView('forgot')}
-          onRegister={() => setCurrentView('register')}
-        />
-      )}
-      {currentView === 'register' && (
-        <AuthRegisterForm
-          onRegister={handleRegister}
-          onLogin={() => setCurrentView('login')}
-        />
-      )}
-      {currentView === 'forgot' && (
-        <AuthForgotPassword
-          onResetPassword={handleResetPassword}
-          onLogin={() => setCurrentView('login')}
-        />
-      )}
-      {currentView === 'dashboard' && user && (
-        <TransportDashboard user={user} onLogout={handleLogout} />
-      )}
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<TransportDashboard user={user} onLogout={handleLogout} />} />
+        </Routes>
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;
 

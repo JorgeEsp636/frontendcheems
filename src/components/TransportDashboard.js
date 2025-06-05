@@ -8,7 +8,12 @@ import PqrsList from './PqrsList';
 const TransportDashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('routes');
   const [searchTerm, setSearchTerm] = useState('');
-  const isAdmin = user.role === 'admin';
+  
+  // Restauramos la verificación de rol
+  const userRole = user?.role || 'user';
+  const isAdmin = userRole === 'admin';
+  const username = user?.username || user?.name || 'Usuario';
+
   const [rates, setRates] = useState([
     { destino: 'ALIZAL', valor: 8400 },
     { destino: 'APARTADERO', valor: 11000 },
@@ -199,150 +204,159 @@ const TransportDashboard = ({ user, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          {/* <h1 className="text-xl font-bold">Rápido El Carmen S.A.</h1> */}
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-600">Bienvenido, {user.email}</span>
-            <span className="text-gray-600">({isAdmin ? 'Administrador' : 'Usuario'})</span>
-            <button
-              onClick={onLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
-            >
-              Cerrar Sesión
-            </button>
+      <nav className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <h1 className="text-xl font-bold text-gray-800">Sistema de Transporte</h1>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <button
+                  onClick={() => setActiveTab('routes')}
+                  className={`${
+                    activeTab === 'routes'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Rutas
+                </button>
+                <button
+                  onClick={() => setActiveTab('rates')}
+                  className={`${
+                    activeTab === 'rates'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Tarifas
+                </button>
+                <button
+                  onClick={() => setActiveTab('drivers')}
+                  className={`${
+                    activeTab === 'drivers'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Conductores
+                </button>
+                <button
+                  onClick={() => setActiveTab('buses')}
+                  className={`${
+                    activeTab === 'buses'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Buses
+                </button>
+                <button
+                  onClick={() => setActiveTab('pqrs')}
+                  className={`${
+                    activeTab === 'pqrs'
+                      ? 'border-indigo-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  PQRS
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-700 mr-4">
+                {username} ({isAdmin ? 'Administrador' : 'Usuario'})
+              </span>
+              <button
+                onClick={onLogout}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
+                Cerrar Sesión
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">
-        {!isAdmin && (
-          <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-            <p className="text-yellow-700">
-              <strong>Nota:</strong> Solo los administradores pueden realizar cambios en el sistema.
-            </p>
-          </div>
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {activeTab === 'routes' && (
+          <TransportRoutes
+            routesData={routesData}
+            userRole={userRole}
+            onUpdateRoute={isAdmin ? handleUpdateRoute : null}
+            onDeleteRoute={isAdmin ? handleDeleteRoute : null}
+          />
         )}
-
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            className={`py-2 px-4 font-medium ${activeTab === 'routes' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('routes')}
-          >
-            Rutas
-          </button>
-          <button
-            className={`py-2 px-4 font-medium ${activeTab === 'rates' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('rates')}
-          >
-            Tarifas
-          </button>
-          <button
-            className={`py-2 px-4 font-medium ${activeTab === 'pqrs' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('pqrs')}
-          >
-            PQRS
-          </button>
-          <button
-            className={`py-2 px-4 font-medium ${activeTab === 'drivers' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('drivers')}
-          >
-            Conductores
-          </button>
-          <button
-            className={`py-2 px-4 font-medium ${activeTab === 'buses' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('buses')}
-          >
-            Buses
-          </button>
-        </div>
-
-        {activeTab === 'routes' && <TransportRoutes routesData={routesData} userRole={user.role} onUpdateRoute={handleUpdateRoute} onDeleteRoute={handleDeleteRoute} />}
-
         {activeTab === 'rates' && (
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-6 text-center">Tarifas Vigentes Año 2025</h2>
-            <p className="text-center text-gray-600 mb-4">Desde Ubaté:</p>
-
-            <div className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Buscar destino..."
-                  className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm rounded-md"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <svg
-                  className="absolute left-3 top-3.5 h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">Gestión de Tarifas</h2>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Buscar destino..."
+                className="w-full px-4 py-2 border rounded-md"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destino</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Destino
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Valor
+                    </th>
                     {isAdmin && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Acciones
+                      </th>
                     )}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredRates.map((rate, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{rate.destino}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {editingRate?.destino === rate.destino ? (
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="number"
-                              value={newRateValue}
-                              onChange={(e) => setNewRateValue(e.target.value)}
-                              className="w-32 px-2 py-1 border border-gray-300 rounded"
-                            />
-                            <button
-                              onClick={handleSaveRate}
-                              className="text-green-600 hover:text-green-800"
-                            >
-                              Guardar
-                            </button>
-                            <button
-                              onClick={() => setEditingRate(null)}
-                              className="text-gray-600 hover:text-gray-800"
-                            >
-                              Cancelar
-                            </button>
-                          </div>
+                  {filteredRates.map((rate) => (
+                    <tr key={rate.destino}>
+                      <td className="px-6 py-4 whitespace-nowrap">{rate.destino}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {editingRate?.destino === rate.destino && isAdmin ? (
+                          <input
+                            type="number"
+                            value={newRateValue}
+                            onChange={(e) => setNewRateValue(e.target.value)}
+                            className="w-32 px-2 py-1 border rounded"
+                            min={minimumRate}
+                          />
                         ) : (
                           formatCurrency(rate.valor)
                         )}
                       </td>
                       {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {editingRate?.destino !== rate.destino && (
-                            <>
-                              <button
-                                onClick={() => handleEditRate(rate)}
-                                className="text-blue-600 hover:text-blue-800 mr-2"
-                              >
-                                Editar
-                              </button>
-                              <button
-                                onClick={() => handleDeleteRate(rate.destino)}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                Eliminar
-                              </button>
-                            </>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {editingRate?.destino === rate.destino ? (
+                            <button
+                              onClick={handleSaveRate}
+                              className="text-green-600 hover:text-green-900 mr-2"
+                            >
+                              Guardar
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleEditRate(rate)}
+                              className="text-blue-600 hover:text-blue-900 mr-2"
+                            >
+                              Editar
+                            </button>
                           )}
+                          <button
+                            onClick={() => handleDeleteRate(rate.destino)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Eliminar
+                          </button>
                         </td>
                       )}
                     </tr>
@@ -350,26 +364,20 @@ const TransportDashboard = ({ user, onLogout }) => {
                 </tbody>
               </table>
             </div>
-
-            <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-              <p className="text-sm text-yellow-700">
-                <span className="font-bold">TARIFA MÍNIMA:</span> {formatCurrency(minimumRate)}
-              </p>
-            </div>
           </div>
         )}
-
-        {activeTab === 'pqrs' && (
-          isAdmin ? (
-            <PqrsList pqrsList={pqrsList} />
-          ) : (
-            <PqrsForm onPqrsSubmit={handleAddPqrs} />
-          )
+        {activeTab === 'drivers' && (
+          <DriverInfo drivers={driverBusData} isAdmin={isAdmin} />
         )}
-
-        {activeTab === 'drivers' && <DriverInfo driverBusData={driverBusData} userRole={user.role} />}
-
-        {activeTab === 'buses' && <BusInfo driverBusData={driverBusData} userRole={user.role} />}
+        {activeTab === 'buses' && (
+          <BusInfo buses={driverBusData.map(d => d.busInfo)} isAdmin={isAdmin} />
+        )}
+        {activeTab === 'pqrs' && (
+          <PqrsList pqrs={pqrsList} isAdmin={isAdmin} />
+        )}
+        {activeTab === 'pqrs-form' && (
+          <PqrsForm onSubmit={handleAddPqrs} />
+        )}
       </main>
     </div>
   );

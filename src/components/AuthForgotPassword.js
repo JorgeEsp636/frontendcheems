@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 const AuthForgotPassword = ({ onResetPassword, onLogin }) => {
   const [email, setEmail] = useState('');
 

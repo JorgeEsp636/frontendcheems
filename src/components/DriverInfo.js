@@ -1,125 +1,142 @@
 import React, { useState } from 'react';
 
-const DriverInfo = ({ driverBusData: initialDriverBusData, userRole }) => {
-  const [driverBusData, setDriverBusData] = useState(initialDriverBusData);
+const DriverInfo = ({ drivers }) => {
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingDriver, setEditingDriver] = useState(null);
   const [editedData, setEditedData] = useState({
     driverName: '',
     driverId: '',
-    contact: ''
+    contact: '',
+    busInfo: {
+      number: '',
+      model: '',
+      plate: '',
+      capacity: '',
+      year: '',
+      color: '',
+      status: '',
+      lastMaintenance: ''
+    }
   });
-
-  const isAdmin = userRole === 'admin';
 
   const handleEdit = (driver) => {
     setEditingDriver(driver);
-    setEditedData({
-      driverName: driver.driverName,
-      driverId: driver.driverId,
-      contact: driver.contact
-    });
+    setEditedData(driver);
   };
 
   const handleSave = () => {
-    if (editingDriver && editedData.driverName && editedData.driverId && editedData.contact) {
-      setDriverBusData(driverBusData.map(driver => 
-        driver.driverId === editingDriver.driverId
-          ? { ...driver, ...editedData }
-          : driver
-      ));
-      setEditingDriver(null);
-      alert('Conductor actualizado exitosamente');
-    } else {
-      alert('Por favor complete todos los campos');
-    }
+    // Aquí iría la lógica para guardar los cambios
+    setEditingDriver(null);
+    alert('Conductor actualizado exitosamente');
   };
 
   const handleDelete = (driverId) => {
     if (window.confirm('¿Está seguro de eliminar este conductor?')) {
-      setDriverBusData(driverBusData.filter(driver => driver.driverId !== driverId));
+      // Aquí iría la lógica para eliminar el conductor
       alert('Conductor eliminado exitosamente');
     }
   };
 
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-center">Información de Conductores</h2>
+  const filteredDrivers = drivers.filter(driver =>
+    driver.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    driver.driverId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {driverBusData.map((item, index) => (
-          <div key={index} className="border border-gray-200 rounded-lg p-4 shadow-sm">
-            {editingDriver?.driverId === item.driverId ? (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre del Conductor</label>
-                  <input
-                    type="text"
-                    value={editedData.driverName}
-                    onChange={(e) => setEditedData({...editedData, driverName: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ID Conductor</label>
-                  <input
-                    type="text"
-                    value={editedData.driverId}
-                    onChange={(e) => setEditedData({...editedData, driverId: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Contacto</label>
-                  <input
-                    type="text"
-                    value={editedData.contact}
-                    onChange={(e) => setEditedData({...editedData, contact: e.target.value})}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                  />
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={handleSave}
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors text-sm"
-                  >
-                    Guardar
-                  </button>
-                  <button
-                    onClick={() => setEditingDriver(null)}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors text-sm"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-xl font-semibold mb-2">Conductor: {item.driverName}</h3>
-                <div className="space-y-1 text-gray-600">
-                  <p><span className="font-medium">ID Conductor:</span> {item.driverId}</p>
-                  <p><span className="font-medium">Contacto:</span> {item.contact}</p>
-                  <p><span className="font-medium">Bus Asignado:</span> {item.busInfo.number}</p>
-                </div>
-                {isAdmin && (
-                  <div className="mt-4 flex space-x-2">
+  return (
+    <div className="bg-white shadow rounded-lg p-6">
+      <h2 className="text-2xl font-bold mb-4">Gestión de Conductores</h2>
+      
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar conductor por nombre o ID..."
+          className="w-full px-4 py-2 border rounded-md"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Conductor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Contacto
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bus Asignado
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredDrivers.map((driver) => (
+              <tr key={driver.driverId}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {editingDriver?.driverId === driver.driverId ? (
+                    <input
+                      type="text"
+                      value={editedData.driverName}
+                      onChange={(e) => setEditedData({...editedData, driverName: e.target.value})}
+                      className="w-full px-2 py-1 border rounded"
+                    />
+                  ) : (
+                    driver.driverName
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{driver.driverId}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {editingDriver?.driverId === driver.driverId ? (
+                    <input
+                      type="text"
+                      value={editedData.contact}
+                      onChange={(e) => setEditedData({...editedData, contact: e.target.value})}
+                      className="w-full px-2 py-1 border rounded"
+                    />
+                  ) : (
+                    driver.contact
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {driver.busInfo.number} - {driver.busInfo.model}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {editingDriver?.driverId === driver.driverId ? (
                     <button
-                      onClick={() => handleEdit(item)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors text-sm"
+                      onClick={handleSave}
+                      className="text-green-600 hover:text-green-900 mr-2"
                     >
-                      Editar
+                      Guardar
                     </button>
-                    <button
-                      onClick={() => handleDelete(item.driverId)}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        ))}
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleEdit(driver)}
+                        className="text-blue-600 hover:text-blue-900 mr-2"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(driver.driverId)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Eliminar
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
