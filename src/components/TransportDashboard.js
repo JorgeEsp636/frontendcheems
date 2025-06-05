@@ -53,6 +53,8 @@ const TransportDashboard = ({ user, onLogout }) => {
 
   const [editingRate, setEditingRate] = useState(null);
   const [newRateValue, setNewRateValue] = useState('');
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newRate, setNewRate] = useState({ destino: '', valor: '' });
   const [pqrsList, setPqrsList] = useState([]);
 
   const handleAddPqrs = (pqrsData) => {
@@ -87,6 +89,22 @@ const TransportDashboard = ({ user, onLogout }) => {
     if (window.confirm(`¿Está seguro de eliminar la tarifa para ${destino}?`)) {
       setRates(rates.filter(rate => rate.destino !== destino));
       alert('Tarifa eliminada exitosamente');
+    }
+  };
+
+  const handleAddNewRate = () => {
+    if (newRate.destino && newRate.valor) {
+      const valor = parseInt(newRate.valor);
+      if (!isNaN(valor) && valor >= minimumRate) {
+        setRates([...rates, { destino: newRate.destino.toUpperCase(), valor }]);
+        setNewRate({ destino: '', valor: '' });
+        setIsAddingNew(false);
+        alert('Tarifa agregada exitosamente');
+      } else {
+        alert(`El valor debe ser mayor o igual a ${formatCurrency(minimumRate)}`);
+      }
+    } else {
+      alert('Por favor complete todos los campos');
     }
   };
 
@@ -304,7 +322,64 @@ const TransportDashboard = ({ user, onLogout }) => {
         )}
         {activeTab === 'rates' && (
           <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Gestión de Tarifas</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Gestión de Tarifas</h2>
+              {isAdmin && (
+                <button
+                  onClick={() => setIsAddingNew(true)}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                >
+                  Agregar Nueva Tarifa
+                </button>
+              )}
+            </div>
+
+            {isAddingNew && isAdmin && (
+              <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                <h3 className="text-lg font-semibold mb-4">Nueva Tarifa</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Destino</label>
+                    <input
+                      type="text"
+                      value={newRate.destino}
+                      onChange={(e) => setNewRate({...newRate, destino: e.target.value})}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                      placeholder="Ingrese el destino"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Valor</label>
+                    <input
+                      type="number"
+                      value={newRate.valor}
+                      onChange={(e) => setNewRate({...newRate, valor: e.target.value})}
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                      placeholder="Ingrese el valor"
+                      min={minimumRate}
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 flex space-x-2">
+                  <button
+                    onClick={handleAddNewRate}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAddingNew(false);
+                      setNewRate({ destino: '', valor: '' });
+                    }}
+                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="mb-4">
               <input
                 type="text"
