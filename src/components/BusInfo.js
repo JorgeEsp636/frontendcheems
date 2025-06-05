@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const BusInfo = ({ buses }) => {
+const BusInfo = ({ buses, isAdmin }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingBus, setEditingBus] = useState(null);
   const [editedData, setEditedData] = useState({
@@ -171,20 +171,22 @@ const BusInfo = ({ buses }) => {
                       Guardar
                     </button>
                   ) : (
-                    <>
-                      <button
-                        onClick={() => handleEdit(bus)}
-                        className="text-blue-600 hover:text-blue-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(bus.number)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Eliminar
-                      </button>
-                    </>
+                    isAdmin && (
+                      <>
+                        <button
+                          onClick={() => handleEdit(bus)}
+                          className="text-blue-600 hover:text-blue-900 mr-2"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(bus.number)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )
                   )}
                 </td>
               </tr>

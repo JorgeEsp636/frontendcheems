@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const DriverInfo = ({ drivers }) => {
+const DriverInfo = ({ drivers, isAdmin }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingDriver, setEditingDriver] = useState(null);
   const [editedData, setEditedData] = useState({
@@ -117,20 +117,22 @@ const DriverInfo = ({ drivers }) => {
                       Guardar
                     </button>
                   ) : (
-                    <>
-                      <button
-                        onClick={() => handleEdit(driver)}
-                        className="text-blue-600 hover:text-blue-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(driver.driverId)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Eliminar
-                      </button>
-                    </>
+                    isAdmin && (
+                      <>
+                        <button
+                          onClick={() => handleEdit(driver)}
+                          className="text-blue-600 hover:text-blue-900 mr-2"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(driver.driverId)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )
                   )}
                 </td>
               </tr>
