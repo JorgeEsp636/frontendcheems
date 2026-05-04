@@ -1,108 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import transportService from '../services/transportService';
 
 const TariffManagement = ({ user }) => {
-  const isAdmin = user?.role === 'admin';
-  // Los datos de tarifas y la lógica de manejo
-  const [rates, setRates] = useState([
-    { destino: 'ALIZAL', valor: 8400 },
-    { destino: 'APARTADERO', valor: 11000 },
-    { destino: 'CAPELLANÍA', valor: 5300 },
-    { destino: 'CARUPA', valor: 5000 },
-    { destino: 'CHOCONTÁ', valor: 15500 },
-    { destino: 'COPER', valor: 36000 },
-    { destino: 'CUCUNUBÁ', valor: 4600 },
-    { destino: 'FUQUENE', valor: 8700 },
-    { destino: 'GUACHETÁ', valor: 10000 },
-    { destino: 'HATO GRANDE', valor: 12200 },
-    { destino: 'LA PLUMA', valor: 9600 },
-    { destino: 'LA YE', valor: 14400 },
-    { destino: 'LENGUAZAQUE', valor: 8700 },
-    { destino: 'NEMOCÓN', valor: 15500 },
-    { destino: 'LA RAMADA ALTA', valor: 10000 },
-    { destino: 'LA RAMADA BAJA', valor: 9000 },
-    { destino: 'ALTO DE CUCUNUBÁ', valor: 9000 },
-    { destino: 'PATIO BONITO', valor: 10800 },
-    { destino: 'PEÑAS DE CAJÓN', valor: 10100 },
-    { destino: 'RAQUIRA', valor: 24500 },
-    { destino: 'SALINAS', valor: 12400 },
-    { destino: 'SAMACÁ', valor: 27000 },
-    { destino: 'SAN MIGUEL DE SEMA', valor: 18000 },
-    { destino: 'SIMIJACA', valor: 11800 },
-    { destino: 'SUESCA', valor: 15500 },
-    { destino: 'SUSA', valor: 10300 },
-    { destino: 'TÁUSA', valor: 6500 },
-    { destino: 'TIERRA NEGRA', valor: 7500 },
-    { destino: 'TURTUR', valor: 31000 },
-    { destino: 'VOLCÁN 1', valor: 6000 },
-    { destino: 'VOLCÁN 2', valor: 6000 },
-    { destino: 'VOLCÁN 3', valor: 8500 },
-    { destino: 'VOLCÁN SOAGA', valor: 6000 },
-    { destino: 'SUTATAUSA', valor: 5000 }
-  ]);
-
+  // Detectar admin con cualquier campo posible
+  const isAdmin = user?.role === 'admin' || user?.rol === 3 || user?.rol_id === 3 || user?.roleId === 3;
+  const [rates, setRates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingRate, setEditingRate] = useState(null);
   const [editedData, setEditedData] = useState({
-    destination: '',
-    value: ''
+    zona_origen: '',
+    zona_destino: '',
+    precio_base: '',
+    precio_km: ''
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newRate, setNewRate] = useState({
-    destination: '',
-    value: ''
+    zona_origen: '',
+    zona_destino: '',
+    precio_base: '',
+    precio_km: ''
   });
+
+  useEffect(() => {
+    loadRates();
+  }, []);
+
+  const loadRates = async () => {
+    try {
+      const ratesData = await transportService.getRates();
+      setRates(ratesData);
+    } catch (error) {
+      console.error('Error al cargar las tarifas:', error);
+    }
+  };
 
   const handleEditRate = (rate) => {
     if (!isAdmin) return;
     setEditingRate(rate);
-    setEditedData(rate);
+    setEditedData({
+      zona_origen: rate.zona_origen,
+      zona_destino: rate.zona_destino,
+      precio_base: rate.precio_base,
+      precio_km: rate.precio_km
+    });
   };
 
-  const handleSaveRate = () => {
+  const handleSaveRate = async () => {
     if (!isAdmin) return;
-    if (editingRate && editedData.value) {
-      const newValue = parseInt(editedData.value);
-      if (!isNaN(newValue) && newValue > 0) {
-        setRates(rates.map(rate => 
-          rate.destino === editingRate.destino 
-            ? { ...rate, valor: newValue }
-            : rate
-        ));
-        setEditingRate(null);
-        alert('Tarifa actualizada exitosamente');
-      } else {
-        alert('Por favor ingrese un valor válido');
-      }
+    try {
+      await transportService.updateRate(editingRate.id_tarifa, editedData);
+      await loadRates();
+      setEditingRate(null);
+      alert('Tarifa actualizada exitosamente');
+    } catch (error) {
+      console.error('Error al actualizar la tarifa:', error);
+      alert('Error al actualizar la tarifa');
     }
   };
 
-  const handleAddNew = () => {
+  const handleAddNew = async () => {
     if (!isAdmin) return;
-    if (newRate.destination && newRate.value) {
-      const valor = parseInt(newRate.value);
-      if (!isNaN(valor) && valor > 0) {
-        setRates([...rates, { destino: newRate.destination.toUpperCase(), valor }]);
-        setNewRate({ destino: '', valor: '' });
-        setIsAddingNew(false);
-        alert('Tarifa agregada exitosamente');
-      } else {
-        alert('Por favor ingrese un valor válido');
-      }
-    } else {
-      alert('Por favor complete todos los campos');
+    try {
+      await transportService.createRate(newRate);
+      await loadRates();
+      setNewRate({
+        zona_origen: '',
+        zona_destino: '',
+        precio_base: '',
+        precio_km: ''
+      });
+      setIsAddingNew(false);
+      alert('Tarifa agregada exitosamente');
+    } catch (error) {
+      console.error('Error al crear la tarifa:', error);
+      alert('Error al crear la tarifa');
     }
   };
 
-  const handleDeleteRate = (destino) => {
+  const handleDeleteRate = async (id_tarifa) => {
     if (!isAdmin) return;
-    if (window.confirm(`¿Está seguro de eliminar la tarifa para ${destino}?`)) {
-      setRates(rates.filter(rate => rate.destino !== destino));
-      alert('Tarifa eliminada exitosamente');
+    if (window.confirm('¿Está seguro de eliminar esta tarifa?')) {
+      try {
+        await transportService.deleteRate(id_tarifa);
+        await loadRates();
+        alert('Tarifa eliminada exitosamente');
+      } catch (error) {
+        console.error('Error al eliminar la tarifa:', error);
+        alert('Error al eliminar la tarifa');
+      }
     }
   };
 
   const filteredRates = rates.filter(rate =>
-    rate.destino.toLowerCase().includes(searchTerm.toLowerCase())
+    rate.zona_destino?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    rate.zona_origen?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatCurrency = (value) => {
@@ -113,16 +104,13 @@ const TariffManagement = ({ user }) => {
     }).format(value);
   };
 
-  const minimumRate = 3700; // Definir la tarifa mínima si es necesaria
-
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <h2 className="text-2xl font-bold mb-4">Gestión de Tarifas</h2>
-      
       <div className="mb-4 flex justify-between items-center">
         <input
           type="text"
-          placeholder="Buscar destino..."
+          placeholder="Buscar por origen o destino..."
           className="w-1/3 px-4 py-2 border rounded-md"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -132,7 +120,7 @@ const TariffManagement = ({ user }) => {
             onClick={() => setIsAddingNew(true)}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
           >
-            Agregar Nueva Tarifa
+            Agregar Tarifa
           </button>
         )}
       </div>
@@ -142,24 +130,45 @@ const TariffManagement = ({ user }) => {
           <h3 className="text-lg font-semibold mb-4">Nueva Tarifa</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Destino</label>
+              <label className="block text-sm font-medium text-gray-700">Zona Origen</label>
               <input
                 type="text"
-                value={newRate.destination}
-                onChange={(e) => setNewRate({...newRate, destination: e.target.value})}
+                value={newRate.zona_origen}
+                onChange={(e) => setNewRate({...newRate, zona_origen: e.target.value})}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el destino"
+                placeholder="Ingrese la zona de origen"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Valor</label>
+              <label className="block text-sm font-medium text-gray-700">Zona Destino</label>
+              <input
+                type="text"
+                value={newRate.zona_destino}
+                onChange={(e) => setNewRate({...newRate, zona_destino: e.target.value})}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                placeholder="Ingrese la zona de destino"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Precio Base</label>
               <input
                 type="number"
-                value={newRate.value}
-                onChange={(e) => setNewRate({...newRate, value: e.target.value})}
+                value={newRate.precio_base}
+                onChange={(e) => setNewRate({...newRate, precio_base: e.target.value})}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el valor"
-                min={minimumRate}
+                placeholder="Ingrese el precio base"
+                min="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Precio por KM</label>
+              <input
+                type="number"
+                value={newRate.precio_km}
+                onChange={(e) => setNewRate({...newRate, precio_km: e.target.value})}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+                placeholder="Ingrese el precio por kilómetro"
+                min="0"
               />
             </div>
           </div>
@@ -180,69 +189,69 @@ const TariffManagement = ({ user }) => {
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Destino
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor
-              </th>
-              {isAdmin && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredRates.map((rate) => (
-              <tr key={rate.destino}>
-                <td className="px-6 py-4 whitespace-nowrap">{rate.destino}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingRate?.destino === rate.destino ? (
-                    <input
-                      type="number"
-                      value={editedData.value}
-                      onChange={(e) => setEditedData({...editedData, value: e.target.value})}
-                      className="w-32 px-2 py-1 border rounded"
-                      min={minimumRate}
-                    />
-                  ) : (
-                    formatCurrency(rate.valor)
-                  )}
-                </td>
-                {isAdmin && (
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingRate?.destino === rate.destino ? (
-                      <button
-                        onClick={handleSaveRate}
-                        className="text-green-600 hover:text-green-900 mr-2"
-                      >
-                        Guardar
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleEditRate(rate)}
-                        className="text-blue-600 hover:text-blue-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                    )}
+      {/* Tarjetas de tarifas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredRates.length === 0 && (
+          <div className="col-span-full text-center text-gray-500">No hay tarifas registradas.</div>
+        )}
+        {filteredRates.map((rate) => (
+          <div key={rate.id_tarifa} className="bg-white border rounded-lg shadow p-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-lg text-blue-700">
+                  {rate.zona_origen} → {rate.zona_destino}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${rate.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {rate.activa ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Precio base:</span> {formatCurrency(rate.precio_base)}
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Precio por KM:</span> {formatCurrency(rate.precio_km)}
+              </div>
+              <div className="text-gray-500 text-xs mb-2">
+                Última actualización: {rate.fecha_actualizacion ? new Date(rate.fecha_actualizacion).toLocaleString('es-CO') : '-'}
+              </div>
+            </div>
+            {isAdmin && (
+              <div className="flex space-x-2 mt-2">
+                {editingRate?.id_tarifa === rate.id_tarifa ? (
+                  <>
                     <button
-                      onClick={() => handleDeleteRate(rate.destino)}
-                      className="text-red-600 hover:text-red-900"
+                      onClick={handleSaveRate}
+                      className="bg-green-100 text-green-800 px-3 py-1 rounded hover:bg-green-200 transition-colors text-sm"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={() => setEditingRate(null)}
+                      className="bg-gray-100 text-gray-800 px-3 py-1 rounded hover:bg-gray-200 transition-colors text-sm"
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleEditRate(rate)}
+                      className="bg-blue-100 text-blue-800 px-3 py-1 rounded hover:bg-blue-200 transition-colors text-sm"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRate(rate.id_tarifa)}
+                      className="bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 transition-colors text-sm"
                     >
                       Eliminar
                     </button>
-                  </td>
+                  </>
                 )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

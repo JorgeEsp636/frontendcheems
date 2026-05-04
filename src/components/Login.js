@@ -1,24 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import authService from '../services/authService';
 
-const Login = ({ onLogin, error, registrationSuccess, setRegistrationSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login = ({ onLogin, error: propError, registrationSuccess, setRegistrationSuccess }) => {
+  const [formData, setFormData] = useState({
+    correo_electronico: '',
+    contrasena: ''
+  });
+  const [error, setError] = useState(propError || '');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (registrationSuccess) {
-      // Optionally clear the success message after a few seconds
-      const timer = setTimeout(() => {
-        setRegistrationSuccess(false);
-      }, 5000); // Hide after 5 seconds
-      return () => clearTimeout(timer);
+    // Verificar si ya hay una sesión activa
+    if (authService.isAuthenticated()) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const from = location.state?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
+      }
     }
-  }, [registrationSuccess, setRegistrationSuccess]);
+  }, [navigate, location]);
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Intentando iniciar sesión con:', { email, password });
-    onLogin(email, password);
+    setError('');
+    setLoading(true);
+
+    try {
+      const success = await onLogin(formData);
+      if (success) {
+        // Verificar que el usuario esté almacenado antes de redirigir
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const from = location.state?.from?.pathname || '/dashboard';
+          navigate(from, { replace: true });
+        } else {
+          setError('Error al iniciar sesión. Por favor, intente nuevamente.');
+        }
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      setError(error.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,40 +63,38 @@ const Login = ({ onLogin, error, registrationSuccess, setRegistrationSuccess }) 
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Iniciar Sesión
           </h2>
+          {registrationSuccess && (
+            <div className="mt-2 text-center text-sm text-green-600">
+              Registro exitoso. Por favor inicia sesión.
+            </div>
+          )}
         </div>
-
-        {registrationSuccess && (
-          <div className="text-green-500 text-sm text-center mb-4">
-            ¡Usuario registrado correctamente! Por favor, inicia sesión.
-          </div>
-        )}
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">Correo electrónico</label>
+              <label htmlFor="correo_electronico" className="sr-only">Correo Electrónico</label>
               <input
-                id="email"
-                name="email"
+                id="correo_electronico"
+                name="correo_electronico"
                 type="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Correo Electrónico"
+                value={formData.correo_electronico}
+                onChange={handleChange}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Contraseña</label>
+              <label htmlFor="contrasena" className="sr-only">Contraseña</label>
               <input
-                id="password"
-                name="password"
+                id="contrasena"
+                name="contrasena"
                 type="password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.contrasena}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -75,23 +108,26 @@ const Login = ({ onLogin, error, registrationSuccess, setRegistrationSuccess }) 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loading}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
-              Iniciar Sesión
+              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </div>
 
-          <div className="text-sm text-center">
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              ¿No tienes cuenta? Regístrate
-            </Link>
-          </div>
-
-          {/* Link de Olvidé mi contraseña */}
-          <div className="text-sm text-center mt-2">
-            <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-              ¿Olvidaste tu contraseña?
-            </Link>
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+            <div className="text-sm">
+              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                ¿No tienes cuenta? Regístrate
+              </Link>
+            </div>
           </div>
         </form>
       </div>

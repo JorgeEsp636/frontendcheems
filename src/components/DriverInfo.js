@@ -1,265 +1,308 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import transportService from '../services/transportService';
 
-const DriverInfo = ({ drivers, isAdmin }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const DriverInfo = ({ drivers, onCreateDriver, onUpdateDriver, onDeleteDriver, isAdmin }) => {
+  const [showModal, setShowModal] = useState(false);
   const [editingDriver, setEditingDriver] = useState(null);
-  const [editedData, setEditedData] = useState({
-    driverName: '',
-    driverId: '',
-    contact: '',
-    busInfo: {
-      number: '',
-      model: '',
-      plate: '',
-      capacity: '',
-      year: '',
-      color: '',
-      status: '',
-      lastMaintenance: ''
-    }
+  const [formData, setFormData] = useState({
+    nombre: '',
+    documento: '',
+    licencia_conduccion: '',
+    telefono: '',
+    email: '',
+    estado: 'activo',
+    id_vehiculos: ''
   });
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [newDriver, setNewDriver] = useState({
-    driverName: '',
-    driverId: '',
-    contact: '',
-    busInfo: {
-      number: '',
-      model: '',
-      plate: '',
-      capacity: '',
-      year: '',
-      color: '',
-      status: 'Operativo',
-      lastMaintenance: ''
+  const [vehiculos, setVehiculos] = useState([]);
+
+  useEffect(() => {
+    if (showModal) {
+      transportService.getBuses && transportService.getBuses().then(setVehiculos);
     }
-  });
+  }, [showModal]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const loadDrivers = async () => {
+    try {
+      const driversData = await transportService.getDrivers();
+      setDrivers(driversData || []);
+    } catch (error) {
+      console.error('Error al cargar los conductores:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const dataToSend = {
+        ...formData,
+        id_vehiculos: parseInt(formData.id_vehiculos)
+      };
+      if (editingDriver) {
+        await onUpdateDriver(editingDriver.id_conductor, dataToSend);
+      } else {
+        await onCreateDriver(dataToSend);
+      }
+      await loadDrivers();
+      setShowModal(false);
+      setEditingDriver(null);
+      setFormData({
+        nombre: '',
+        documento: '',
+        licencia_conduccion: '',
+        telefono: '',
+        email: '',
+        estado: 'activo',
+        id_vehiculos: ''
+      });
+    } catch (error) {
+      console.error('Error al guardar el conductor:', error);
+    }
+  };
 
   const handleEdit = (driver) => {
-    if (!isAdmin) return;
     setEditingDriver(driver);
-    setEditedData(driver);
+    setFormData({
+      nombre: driver.nombre,
+      documento: driver.documento,
+      licencia_conduccion: driver.licencia_conduccion,
+      telefono: driver.telefono,
+      email: driver.email,
+      estado: driver.estado,
+      id_vehiculos: driver.id_vehiculos
+    });
+    setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (!isAdmin) return;
-    // Aquí iría la lógica para guardar los cambios
-    setEditingDriver(null);
-    alert('Conductor actualizado exitosamente');
-  };
-
-  const handleAddNew = () => {
-    if (!isAdmin) return;
-    if (newDriver.driverName && newDriver.driverId && newDriver.contact) {
-      // Aquí iría la lógica para agregar el nuevo conductor
-      setNewDriver({
-        driverName: '',
-        driverId: '',
-        contact: '',
-        busInfo: {
-          number: '',
-          model: '',
-          plate: '',
-          capacity: '',
-          year: '',
-          color: '',
-          status: 'Operativo',
-          lastMaintenance: ''
-        }
-      });
-      setIsAddingNew(false);
-      alert('Conductor agregado exitosamente');
-    } else {
-      alert('Por favor complete todos los campos requeridos');
+  const handleDelete = async (driverId) => {
+    if (window.confirm('¿Está seguro de que desea eliminar este conductor?')) {
+      try {
+        await onDeleteDriver(driverId);
+        await loadDrivers();
+      } catch (error) {
+        console.error('Error al eliminar el conductor:', error);
+      }
     }
   };
-
-  const handleDelete = (driverId) => {
-    if (!isAdmin) return;
-    if (window.confirm('¿Está seguro de eliminar este conductor?')) {
-      // Aquí iría la lógica para eliminar el conductor
-      alert('Conductor eliminado exitosamente');
-    }
-  };
-
-  const filteredDrivers = drivers.filter(driver =>
-    driver.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.driverId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Gestión de Conductores</h2>
-      
-      <div className="mb-4 flex justify-between items-center">
-        <input
-          type="text"
-          placeholder="Buscar conductor por nombre o ID..."
-          className="w-1/3 px-4 py-2 border rounded-md"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-2xl font-bold">Conductores</h3>
         {isAdmin && (
           <button
-            onClick={() => setIsAddingNew(true)}
+            onClick={() => {
+              setEditingDriver(null);
+              setFormData({
+                nombre: '',
+                documento: '',
+                licencia_conduccion: '',
+                telefono: '',
+                email: '',
+                estado: 'activo',
+                id_vehiculos: ''
+              });
+              setShowModal(true);
+            }}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
           >
-            Agregar Nuevo Conductor
+            Agregar Conductor
           </button>
         )}
       </div>
-
-      {isAddingNew && isAdmin && (
-        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          <h3 className="text-lg font-semibold mb-4">Nuevo Conductor</h3>
-          <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {drivers.length === 0 && (
+          <div className="col-span-full text-center text-gray-500">No hay conductores registrados.</div>
+        )}
+        {drivers.map((driver) => (
+          <div key={driver.id_conductor} className="bg-white border rounded-lg shadow p-4 flex flex-col justify-between">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre del Conductor</label>
-              <input
-                type="text"
-                value={newDriver.driverName}
-                onChange={(e) => setNewDriver({...newDriver, driverName: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el nombre"
-              />
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-lg text-blue-700">
+                  {driver.nombre ? driver.nombre : '-'}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${driver.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {driver.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Documento:</span> {driver.documento ? driver.documento : '-'}
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Licencia:</span> {driver.licencia_conduccion ? driver.licencia_conduccion : '-'}
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Teléfono:</span> {driver.telefono ? driver.telefono : '-'}
+              </div>
+              <div className="text-gray-700 mb-1">
+                <span className="font-medium">Email:</span> {driver.email ? driver.email : '-'}
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">ID del Conductor</label>
-              <input
-                type="text"
-                value={newDriver.driverId}
-                onChange={(e) => setNewDriver({...newDriver, driverId: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el ID"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Contacto</label>
-              <input
-                type="text"
-                value={newDriver.contact}
-                onChange={(e) => setNewDriver({...newDriver, contact: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el contacto"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Bus Asignado</label>
-              <input
-                type="text"
-                value={newDriver.busInfo.number}
-                onChange={(e) => setNewDriver({
-                  ...newDriver,
-                  busInfo: {...newDriver.busInfo, number: e.target.value}
-                })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
-                placeholder="Ingrese el número del bus"
-              />
-            </div>
+            {isAdmin && (
+              <div className="flex space-x-2 mt-2">
+                <button
+                  onClick={() => handleEdit(driver)}
+                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded hover:bg-blue-200 transition-colors text-sm"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(driver.id_conductor)}
+                  className="bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 transition-colors text-sm"
+                >
+                  Eliminar
+                </button>
+              </div>
+            )}
           </div>
-          <div className="mt-4 flex space-x-2">
-            <button
-              onClick={handleAddNew}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
-            >
-              Guardar
-            </button>
-            <button
-              onClick={() => setIsAddingNew(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
-            >
-              Cancelar
-            </button>
+        ))}
+      </div>
+
+      {showModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <form onSubmit={handleSubmit}>
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="mb-4">
+                    <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+                      Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      id="nombre"
+                      value={formData.nombre}
+                      onChange={handleInputChange}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="documento" className="block text-sm font-medium text-gray-700">
+                      Documento de Identidad
+                    </label>
+                    <input
+                      type="text"
+                      name="documento"
+                      id="documento"
+                      value={formData.documento}
+                      onChange={handleInputChange}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="licencia_conduccion" className="block text-sm font-medium text-gray-700">
+                      Número de Licencia
+                    </label>
+                    <input
+                      type="text"
+                      name="licencia_conduccion"
+                      id="licencia_conduccion"
+                      value={formData.licencia_conduccion}
+                      onChange={handleInputChange}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">
+                      Teléfono
+                    </label>
+                    <input
+                      type="tel"
+                      name="telefono"
+                      id="telefono"
+                      value={formData.telefono}
+                      onChange={handleInputChange}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Correo Electrónico
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
+                      Estado
+                    </label>
+                    <select
+                      name="estado"
+                      id="estado"
+                      value={formData.estado}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    >
+                      <option value="activo">Activo</option>
+                      <option value="inactivo">Inactivo</option>
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="id_vehiculos" className="block text-sm font-medium text-gray-700">
+                      Vehículo
+                    </label>
+                    <select
+                      name="id_vehiculos"
+                      id="id_vehiculos"
+                      value={formData.id_vehiculos}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    >
+                      <option value="">Selecciona un vehículo</option>
+                      {vehiculos.map((vehiculo) => (
+                        <option key={vehiculo.id_vehiculos} value={vehiculo.id_vehiculos}>
+                          {vehiculo.placa} - {vehiculo.empresa}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="submit"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    {editingDriver ? 'Actualizar' : 'Crear'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditingDriver(null);
+                    }}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Conductor
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contacto
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bus Asignado
-              </th>
-              {isAdmin && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredDrivers.map((driver) => (
-              <tr key={driver.driverId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingDriver?.driverId === driver.driverId ? (
-                    <input
-                      type="text"
-                      value={editedData.driverName}
-                      onChange={(e) => setEditedData({...editedData, driverName: e.target.value})}
-                      className="w-full px-2 py-1 border rounded"
-                    />
-                  ) : (
-                    driver.driverName
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{driver.driverId}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {editingDriver?.driverId === driver.driverId ? (
-                    <input
-                      type="text"
-                      value={editedData.contact}
-                      onChange={(e) => setEditedData({...editedData, contact: e.target.value})}
-                      className="w-full px-2 py-1 border rounded"
-                    />
-                  ) : (
-                    driver.contact
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {driver.busInfo.number} - {driver.busInfo.model}
-                </td>
-                {isAdmin && (
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingDriver?.driverId === driver.driverId ? (
-                      <button
-                        onClick={handleSave}
-                        className="text-green-600 hover:text-green-900 mr-2"
-                      >
-                        Guardar
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEdit(driver)}
-                          className="text-blue-600 hover:text-blue-900 mr-2"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDelete(driver.driverId)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Eliminar
-                        </button>
-                      </>
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };

@@ -13,36 +13,27 @@ const ForgotPassword = () => {
     setMessage(null);
     setError(null);
 
-    console.log('Solicitando restablecimiento de contraseña para:', email); // Lógica de backend pendiente
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/recuperar-contrasena/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ correo_electronico: email }),
+      });
+      const data = await response.json();
 
-    // Aquí iría la lógica para llamar a tu API de backend
-    // try {
-    //   const response = await fetch('/api/forgot-password', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ email }),
-    //   });
-    //   const data = await response.json();
-
-    //   if (response.ok) {
-    //     setMessage(data.message || 'Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña.');
-    //   } else {
-    //     setError(data.message || 'Ocurrió un error. Inténtalo de nuevo.');
-    //   }
-    // } catch (err) {
-    //   setError('Error de conexión. Inténtalo más tarde.');
-    // } finally {
-    //   setIsLoading(false);
-    // }
-
-    // Simulación de respuesta (eliminar esto cuando implementes la lógica de backend)
-    setTimeout(() => {
+      if (response.ok) {
+        setMessage(data.confirmación || 'Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña.');
+        setEmail('');
+      } else {
+        setError(data.error || 'Ocurrió un error. Inténtalo de nuevo.');
+      }
+    } catch (err) {
+      setError('Error de conexión. Inténtalo más tarde.');
+    } finally {
       setIsLoading(false);
-      setMessage('Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña.');
-       setEmail(''); // Limpiar el campo después de enviar (opcional)
-    }, 2000); // Simula una llamada a API de 2 segundos
+    }
   };
 
   return (

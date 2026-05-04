@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
                 // Si falla el refresh, redirigir al login
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
-                window.location.href = '/login';
+                window.location.href = '/';
                 return Promise.reject(refreshError);
             }
         }
