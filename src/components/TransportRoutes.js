@@ -105,9 +105,9 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="card card-pad">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-2xl font-bold">Rutas de Transporte</h3>
+        <h3 className="card-title">Rutas de Transporte</h3>
         {isAdmin && (
           <button
             onClick={() => {
@@ -123,7 +123,7 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
               });
               setShowModal(true);
             }}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+            className="btn-primary"
           >
             Agregar Ruta
           </button>
@@ -134,61 +134,58 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
           <div className="col-span-full text-center text-gray-500">No hay rutas registradas.</div>
         )}
         {routes.map((route) => (
-          <div key={route.id_ruta} className="bg-white border rounded-lg shadow p-4 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-lg text-blue-700">
-                  {route.nombre_ruta ? route.nombre_ruta : '-'}
-                </span>
+          <div key={route.id_ruta} className="card brand-gradient-fill p-4 flex flex-col justify-between text-white">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-lg text-white">
+                    {route.nombre_ruta ? route.nombre_ruta : '-'}
+                  </span>
+                </div>
+                <div className="text-white/90 mb-1">
+                  <span className="font-semibold text-white">Origen:</span> {route.origen ? route.origen : '-'}
+                </div>
+                <div className="text-white/90 mb-1">
+                  <span className="font-semibold text-white">Destino:</span> {route.destino ? route.destino : '-'}
+                </div>
+                <div className="text-white/90 mb-1">
+                  <span className="font-semibold text-white">Horario:</span> {route.horario ? route.horario : '-'}
+                </div>
+                <div className="text-white/90 mb-1">
+                  <span className="font-semibold text-white">Duración:</span> {route.duracion ? route.duracion : '-'}
+                </div>
+                <div className="text-white/90 mb-1">
+                  <span className="font-semibold text-white">Distancia:</span> {route.distancia ? route.distancia : '-'}
+                </div>
               </div>
-              <div className="text-gray-700 mb-1">
-                <span className="font-medium">Origen:</span> {route.origen ? route.origen : '-'}
-              </div>
-              <div className="text-gray-700 mb-1">
-                <span className="font-medium">Destino:</span> {route.destino ? route.destino : '-'}
-              </div>
-              <div className="text-gray-700 mb-1">
-                <span className="font-medium">Horario:</span> {route.horario ? route.horario : '-'}
-              </div>
-              <div className="text-gray-700 mb-1">
-                <span className="font-medium">Duración:</span> {route.duracion ? route.duracion : '-'}
-              </div>
-              <div className="text-gray-700 mb-1">
-                <span className="font-medium">Distancia:</span> {route.distancia ? route.distancia : '-'}
-              </div>
-            </div>
-            {isAdmin && (
-              <div className="flex space-x-2 mt-2">
-                <button
-                  onClick={() => handleEdit(route)}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded hover:bg-blue-200 transition-colors text-sm"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(route.id_ruta)}
-                  className="bg-red-100 text-red-800 px-3 py-1 rounded hover:bg-red-200 transition-colors text-sm"
-                >
-                  Eliminar
-                </button>
-              </div>
-            )}
+              {isAdmin && (
+                <div className="flex space-x-2 mt-2">
+                  <button
+                    onClick={() => handleEdit(route)}
+                    className="btn-soft px-3 py-1.5 text-sm bg-white/15 text-white border-white/20 hover:bg-white/20 focus:ring-white/30"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(route.id_ruta)}
+                    className="btn-soft px-3 py-1.5 text-sm bg-rose-500/20 text-white border-rose-200/30 hover:bg-rose-500/25 focus:ring-white/30"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              )}
           </div>
         ))}
       </div>
 
       {showModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <>
+          <div className="modal-overlay" aria-hidden="true"></div>
+          <div className="modal-wrap">
+            <div className="modal-sheet">
               <form onSubmit={handleSubmit}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="p-5 sm:p-6">
                   <div className="mb-4">
-                    <label htmlFor="nombre_ruta" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="nombre_ruta" className="field-label">
                       Nombre de la Ruta
                     </label>
                     <input
@@ -197,12 +194,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="nombre_ruta"
                       value={formData.nombre_ruta}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="origen" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="origen" className="field-label">
                       Origen
                     </label>
                     <input
@@ -211,12 +208,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="origen"
                       value={formData.origen}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="destino" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="destino" className="field-label">
                       Destino
                     </label>
                     <input
@@ -225,12 +222,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="destino"
                       value={formData.destino}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="horario" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="horario" className="field-label">
                       Horario
                     </label>
                     <input
@@ -239,12 +236,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="horario"
                       value={formData.horario}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="duracion" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="duracion" className="field-label">
                       Duración
                     </label>
                     <input
@@ -253,12 +250,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="duracion"
                       value={formData.duracion}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="distancia" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="distancia" className="field-label">
                       Distancia
                     </label>
                     <input
@@ -267,12 +264,12 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="distancia"
                       value={formData.distancia}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="id_vehiculos" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="id_vehiculos" className="field-label">
                       Vehículo
                     </label>
                     <select
@@ -280,7 +277,7 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       id="id_vehiculos"
                       value={formData.id_vehiculos}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field mt-1"
                       required
                     >
                       <option value="">Selecciona un vehículo</option>
@@ -292,10 +289,10 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                     </select>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <div className="bg-slate-50 px-5 py-4 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
                   <button
                     type="submit"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="btn-primary w-full sm:w-auto"
                   >
                     {editingRoute ? 'Actualizar' : 'Crear'}
                   </button>
@@ -305,7 +302,7 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
                       setShowModal(false);
                       setEditingRoute(null);
                     }}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="btn-secondary w-full sm:w-auto"
                   >
                     Cancelar
                   </button>
@@ -313,7 +310,7 @@ const TransportRoutes = ({ isAdmin, onCreateRoute, onUpdateRoute, onDeleteRoute 
               </form>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

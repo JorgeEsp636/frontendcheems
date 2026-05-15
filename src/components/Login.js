@@ -23,6 +23,10 @@ const Login = ({ onLogin, error: propError, registrationSuccess, setRegistration
     }
   }, [navigate, location]);
 
+  useEffect(() => {
+    setError(propError || '');
+  }, [propError]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -57,79 +61,129 @@ const Login = ({ onLogin, error: propError, registrationSuccess, setRegistration
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar Sesión
-          </h2>
-          {registrationSuccess && (
-            <div className="mt-2 text-center text-sm text-green-600">
-              Registro exitoso. Por favor inicia sesión.
-            </div>
-          )}
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="correo_electronico" className="sr-only">Correo Electrónico</label>
-              <input
-                id="correo_electronico"
-                name="correo_electronico"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Correo Electrónico"
-                value={formData.correo_electronico}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="contrasena" className="sr-only">Contraseña</label>
-              <input
-                id="contrasena"
-                name="contrasena"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Contraseña"
-                value={formData.contrasena}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-10">
+      {/* Fondo tipo mockup (sin tocar lógica) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B3B57] to-[#061E2C]" />
+      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.18),_transparent_55%)]" />
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+      <div className="relative w-full max-w-md">
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center border border-white/15">
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-white"
+              aria-hidden="true"
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-            </button>
+              <path
+                d="M12 2.25 20.25 6.9V17.1L12 21.75 3.75 17.1V6.9L12 2.25Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M12 2.25V12m0 0 8.25-5.1M12 12 3.75 6.9"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+            </svg>
           </div>
+          <div className="mt-3 text-white font-semibold tracking-[0.2em]">CHEEMS</div>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                ¿Olvidaste tu contraseña?
-              </Link>
+        <div className="rounded-[28px] bg-white/90 backdrop-blur shadow-2xl border border-white/60 overflow-hidden">
+          <div className="p-6 sm:p-7">
+            {/* Tabs (solo navegación) */}
+            <div className="flex items-center justify-center">
+              <div className="inline-flex rounded-full bg-slate-200/70 p-1">
+                <span className="px-4 py-2 rounded-full text-sm font-semibold bg-[#0B3B57] text-white">
+                  Log In
+                </span>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-800"
+                  onClick={() => setRegistrationSuccess?.(false)}
+                >
+                  Sing Up
+                </Link>
+              </div>
             </div>
-            <div className="text-sm">
-              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                ¿No tienes cuenta? Regístrate
-              </Link>
-            </div>
+
+            <h2 className="mt-5 text-center text-lg font-semibold text-slate-800">
+              Bienvenido a CHEEMS
+            </h2>
+
+            {registrationSuccess && (
+              <div className="mt-2 text-center text-sm text-green-700">
+                Registro exitoso. Por favor inicia sesión.
+              </div>
+            )}
+
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="correo_electronico" className="sr-only">Correo</label>
+                <input
+                  id="correo_electronico"
+                  name="correo_electronico"
+                  type="email"
+                  required
+                  className="w-full bg-transparent border-0 border-b border-slate-300 px-1 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#0B3B57]"
+                  placeholder="Correo"
+                  value={formData.correo_electronico}
+                  onChange={handleChange}
+                  autoComplete="email"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="contrasena" className="sr-only">Contraseña</label>
+                <input
+                  id="contrasena"
+                  name="contrasena"
+                  type="password"
+                  required
+                  className="w-full bg-transparent border-0 border-b border-slate-300 px-1 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#0B3B57]"
+                  placeholder="Contraseña"
+                  value={formData.contrasena}
+                  onChange={handleChange}
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {error && (
+                <div className="text-red-600 text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`mt-2 w-full rounded-full py-3 text-sm font-semibold text-white transition ${
+                  loading ? 'bg-[#0B3B57]/60' : 'bg-[#0B3B57] hover:bg-[#083248]'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B3B57]`}
+              >
+                {loading ? 'Iniciando sesión...' : 'Inicia Sesión'}
+              </button>
+
+              <div className="text-center pt-2">
+                <Link to="/forgot-password" className="text-xs text-[#0B3B57] hover:underline">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
+
+        {/* CTA inferior tipo mockup */}
+        <div className="mt-6 text-center text-sm text-white/90">
+          ¿No tienes una cuenta?{' '}
+          <Link to="/register" className="font-semibold underline underline-offset-4">
+            Regístrate
+          </Link>
+        </div>
       </div>
     </div>
   );

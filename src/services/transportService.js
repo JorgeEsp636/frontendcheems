@@ -247,4 +247,5 @@ const transportService = {
     }
 };
 
+export { axiosInstance };
 export default transportService; 

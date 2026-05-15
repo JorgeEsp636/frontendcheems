@@ -64,10 +64,10 @@ const AdminDashboardCharts = () => {
   if (loading) return <div className="text-center text-gray-500">Cargando gráficas...</div>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
       {/* Tarifas */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-xl font-bold mb-4 text-center">Tarifas activas vs inactivas</h3>
+      <div className="card p-4">
+        <h3 className="text-base sm:text-lg font-bold mb-4 text-center">Tarifas activas vs inactivas</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie data={tarifasData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
@@ -79,8 +79,8 @@ const AdminDashboardCharts = () => {
         </ResponsiveContainer>
       </div>
       {/* Rutas */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-xl font-bold mb-4 text-center">Cantidad de rutas</h3>
+      <div className="card p-4">
+        <h3 className="text-base sm:text-lg font-bold mb-4 text-center">Cantidad de rutas</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={rutasData}>
             <XAxis dataKey="name" hide />
@@ -89,11 +89,11 @@ const AdminDashboardCharts = () => {
             <Tooltip />
           </BarChart>
         </ResponsiveContainer>
-        <div className="text-center text-gray-600 mt-2">Total: {rutas.length}</div>
+        <div className="text-center text-slate-600 mt-2">Total: {rutas.length}</div>
       </div>
       {/* Conductores */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-xl font-bold mb-4 text-center">Conductores activos vs inactivos</h3>
+      <div className="card p-4">
+        <h3 className="text-base sm:text-lg font-bold mb-4 text-center">Conductores activos vs inactivos</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie data={conductoresData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
@@ -105,8 +105,8 @@ const AdminDashboardCharts = () => {
         </ResponsiveContainer>
       </div>
       {/* Buses */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-xl font-bold mb-4 text-center">Buses por estado</h3>
+      <div className="card p-4">
+        <h3 className="text-base sm:text-lg font-bold mb-4 text-center">Buses por estado</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie data={busesData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>

@@ -9,9 +9,175 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f7f9fc;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-} 
+}
+
+@layer components {
+  .brand-gradient-text {
+    background-image: linear-gradient(135deg, #0B3B57 0%, #0E5D86 45%, #061E2C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .brand-gradient-fill {
+    background-image: linear-gradient(135deg, #0B3B57 0%, #0E5D86 45%, #061E2C 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 10px 30px rgba(2, 8, 23, 0.10);
+  }
+
+  .chip-on-dark {
+    @apply chip bg-white/15 text-white border border-white/20;
+  }
+
+  .chip-on-dark-success {
+    @apply chip bg-emerald-400/20 text-white border border-emerald-200/30;
+  }
+
+  .chip-on-dark-danger {
+    @apply chip bg-rose-400/20 text-white border border-rose-200/30;
+  }
+
+  .brand-gradient-border {
+    background: linear-gradient(135deg, #0B3B57 0%, #0E5D86 45%, #061E2C 100%);
+    padding: 1px;
+    border-radius: 1rem;
+  }
+
+  .brand-gradient-border > .brand-gradient-border-inner {
+    @apply bg-white rounded-2xl;
+  }
+
+  .app-shell {
+    @apply min-h-screen bg-slate-50 text-slate-900;
+  }
+
+  .app-topbar {
+    @apply sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-slate-200;
+  }
+
+  .app-topbar-inner {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 h-14 flex items-center justify-between gap-3;
+  }
+
+  .app-title {
+    @apply text-base sm:text-lg font-extrabold tracking-tight text-slate-900;
+  }
+
+  .app-subtle {
+    @apply text-xs sm:text-sm text-slate-500;
+  }
+
+  .app-content {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 py-4 sm:py-6;
+  }
+
+  .content-safe-bottom {
+    @apply pb-24 sm:pb-6;
+  }
+
+  .surface {
+    @apply bg-white border border-slate-200 shadow-sm;
+  }
+
+  .card {
+    @apply surface rounded-2xl;
+  }
+
+  .card-pad {
+    @apply p-5 sm:p-6;
+  }
+
+  .card-title {
+    @apply text-lg sm:text-xl font-bold tracking-tight;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .chip-success {
+    @apply chip bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .chip-danger {
+    @apply chip bg-rose-50 text-rose-700 border border-rose-200;
+  }
+
+  .chip-info {
+    @apply chip bg-sky-50 text-sky-700 border border-sky-200;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-slate-100 text-slate-800 hover:bg-slate-200 focus:ring-slate-400;
+  }
+
+  .btn-danger {
+    @apply btn bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500;
+  }
+
+  .btn-soft {
+    @apply btn bg-slate-50 text-slate-800 border border-slate-200 hover:bg-slate-100 focus:ring-slate-300;
+  }
+
+  .btn-soft-blue {
+    @apply btn bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100 focus:ring-blue-300;
+  }
+
+  .btn-soft-rose {
+    @apply btn bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 focus:ring-rose-300;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  .field-label {
+    @apply block text-sm font-semibold text-slate-700;
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[2px];
+  }
+
+  .modal-wrap {
+    @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4;
+  }
+
+  .modal-sheet {
+    @apply w-full sm:max-w-lg rounded-2xl bg-white border border-slate-200 shadow-xl overflow-hidden;
+  }
+
+  .bottom-tabbar {
+    @apply fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur border-t border-slate-200 sm:hidden;
+  }
+
+  .bottom-tabbar-inner {
+    @apply mx-auto max-w-7xl px-2 h-16 grid gap-1 items-center;
+  }
+
+  .tab-item {
+    @apply h-12 rounded-xl flex flex-col items-center justify-center text-[11px] font-semibold text-slate-500 transition-colors;
+  }
+
+  .tab-item-active {
+    @apply bg-blue-50 text-blue-700;
+  }
+
+  .fab {
+    @apply fixed bottom-20 right-4 z-50 h-12 w-12 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:hidden flex items-center justify-center text-xl font-bold;
+  }
+}

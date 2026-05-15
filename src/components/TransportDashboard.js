@@ -10,6 +10,7 @@ import transportService from '../services/transportService';
 import authService from '../services/authService';
 import TariffManagement from './TariffManagement';
 import AdminDashboardCharts from './AdminDashboardCharts';
+import AssistantChat from './AssistantChat';
 
 const TransportDashboard = ({ user: propUser, onLogout }) => {
   const [activeTab, setActiveTab] = useState('routes');
@@ -348,93 +349,72 @@ const TransportDashboard = ({ user: propUser, onLogout }) => {
     );
   }
 
+  const displayName = user?.nombre || user?.name || 'Usuario';
+  const displayRole = getRoleName(user);
+
+  const tabs = [
+    { id: 'routes', label: 'Rutas' },
+    { id: 'rates', label: 'Tarifas' },
+    { id: 'drivers', label: 'Conductores' },
+    { id: 'buses', label: 'Buses' },
+    { id: 'pqrs', label: 'PQRS' },
+    { id: 'assistant', label: 'Asistente' },
+  ];
+  if (isAdmin) tabs.push({ id: 'dashboard', label: 'Dashboard' });
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-800">CHEEMS Transport</h1>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <div className="flex space-x-4 mb-6 justify-center">
-                  <button
-                    className={`px-4 py-2 rounded ${activeTab === 'routes' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => setActiveTab('routes')}
-                  >
-                    Rutas
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded ${activeTab === 'rates' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => setActiveTab('rates')}
-                  >
-                    Tarifas
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded ${activeTab === 'drivers' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => setActiveTab('drivers')}
-                  >
-                    Conductores
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded ${activeTab === 'buses' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => setActiveTab('buses')}
-                  >
-                    Buses
-                  </button>
-                  <button
-                    className={`px-4 py-2 rounded ${activeTab === 'pqrs' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                    onClick={() => setActiveTab('pqrs')}
-                  >
-                    PQRS
-                  </button>
-                  {isAdmin && (
-                    <button
-                      className={`px-4 py-2 rounded ${activeTab === 'dashboard' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                      onClick={() => setActiveTab('dashboard')}
-                    >
-                      Dashboard
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center space-x-4">
-                <div className="text-gray-700">
-                  {(() => {
-                    const nombre = user?.nombre || user?.name || 'Usuario';
-                    const rol = getRoleName(user);
-                    return rol ? (
-                      <span className="font-medium">{nombre} <span className="text-sm text-gray-500">({rol})</span></span>
-                    ) : (
-                      <span className="font-medium">{nombre}</span>
-                    );
-                  })()}
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Cerrar Sesión
-                </button>
-              </div>
+    <div className="app-shell">
+      <header className="app-topbar">
+        <div className="app-topbar-inner">
+          <div className="min-w-0">
+            <div className="app-title">CHEEMS Transport</div>
+            <div className="app-subtle truncate">
+              {displayRole ? (
+                <>
+                  <span className="font-semibold text-slate-700">{displayName}</span>{' '}
+                  <span>({displayRole})</span>
+                </>
+              ) : (
+                <span className="font-semibold text-slate-700">{displayName}</span>
+              )}
             </div>
           </div>
+
+          <div className="hidden sm:flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 border border-slate-200 p-1">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  className={`btn px-3 py-1.5 text-sm ${
+                    activeTab === t.id ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500' : 'bg-transparent text-slate-700 hover:bg-white focus:ring-slate-300'
+                  }`}
+                  onClick={() => setActiveTab(t.id)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={handleLogout} className="btn-danger">
+              Cerrar sesión
+            </button>
+          </div>
+
+          <button onClick={handleLogout} className="btn-danger sm:hidden px-3 py-2">
+            Salir
+          </button>
         </div>
-      </nav>
+      </header>
 
       {error && (
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div className="app-content">
+          <div className="card card-pad border-rose-200 bg-rose-50 text-rose-800" role="alert">
             <span className="block sm:inline">{error}</span>
           </div>
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+      <main className="app-content content-safe-bottom">
+        <div className="space-y-4">
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -492,10 +472,25 @@ const TransportDashboard = ({ user: propUser, onLogout }) => {
               {activeTab === 'dashboard' && isAdmin && (
                 <AdminDashboardCharts />
               )}
+              {activeTab === 'assistant' && <AssistantChat />}
             </>
           )}
         </div>
       </main>
+
+      <nav className="bottom-tabbar" aria-label="Navegación inferior">
+        <div className={`bottom-tabbar-inner ${isAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              className={`tab-item ${activeTab === t.id ? 'tab-item-active' : ''}`}
+              onClick={() => setActiveTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 };
