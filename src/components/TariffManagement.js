@@ -106,152 +106,209 @@ const TariffManagement = ({ user }) => {
 
   return (
     <div className="card card-pad">
-      <h2 className="card-title mb-4">Gestión de Tarifas</h2>
-      <div className="mb-4 flex justify-between items-center">
-        <input
-          type="text"
-          placeholder="Buscar por origen o destino..."
-          className="field w-1/2 sm:w-1/3"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        {isAdmin && (
-          <button
-            onClick={() => setIsAddingNew(true)}
-            className="btn-primary"
-          >
-            Agregar Tarifa
-          </button>
-        )}
+      <div className="glass-card-header flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="card-title text-xl font-bold">
+            <span className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sm">💳</span>
+            Gestión de Tarifas
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">Configuración de precios base y tarifas por kilómetro</p>
+        </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <input
+              type="text"
+              placeholder="Buscar origen o destino..."
+              className="field pl-9 text-xs"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <span className="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+          </div>
+          {isAdmin && (
+            <button
+              onClick={() => setIsAddingNew(true)}
+              className="btn-primary text-xs shrink-0"
+            >
+              + Nueva Tarifa
+            </button>
+          )}
+        </div>
       </div>
 
       {isAddingNew && isAdmin && (
-        <div className="surface rounded-2xl p-4 sm:p-5 mb-4 bg-slate-50">
-          <h3 className="text-base sm:text-lg font-bold mb-4">Nueva Tarifa</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-6 rounded-3xl bg-slate-800/80 backdrop-blur-2xl border border-sky-400/40 shadow-glass-glow mb-6 animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span>✨</span> Registrar Nueva Tarifa
+            </h3>
+            <button
+              onClick={() => setIsAddingNew(false)}
+              className="text-slate-400 hover:text-white text-xs"
+            >
+              ✕ Cerrar
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="field-label">Zona Origen</label>
+              <label className="field-label text-xs">Zona Origen</label>
               <input
                 type="text"
                 value={newRate.zona_origen}
                 onChange={(e) => setNewRate({...newRate, zona_origen: e.target.value})}
-                className="field mt-1"
-                placeholder="Ingrese la zona de origen"
+                className="field"
+                placeholder="Ej. Centro"
               />
             </div>
             <div>
-              <label className="field-label">Zona Destino</label>
+              <label className="field-label text-xs">Zona Destino</label>
               <input
                 type="text"
                 value={newRate.zona_destino}
                 onChange={(e) => setNewRate({...newRate, zona_destino: e.target.value})}
-                className="field mt-1"
-                placeholder="Ingrese la zona de destino"
+                className="field"
+                placeholder="Ej. Norte"
               />
             </div>
             <div>
-              <label className="field-label">Precio Base</label>
+              <label className="field-label text-xs">Precio Base (COP)</label>
               <input
                 type="number"
                 value={newRate.precio_base}
                 onChange={(e) => setNewRate({...newRate, precio_base: e.target.value})}
-                className="field mt-1"
-                placeholder="Ingrese el precio base"
+                className="field"
+                placeholder="Ej. 2800"
                 min="0"
               />
             </div>
             <div>
-              <label className="field-label">Precio por KM</label>
+              <label className="field-label text-xs">Precio por KM (COP)</label>
               <input
                 type="number"
                 value={newRate.precio_km}
                 onChange={(e) => setNewRate({...newRate, precio_km: e.target.value})}
-                className="field mt-1"
-                placeholder="Ingrese el precio por kilómetro"
+                className="field"
+                placeholder="Ej. 150"
                 min="0"
               />
             </div>
           </div>
-          <div className="mt-4 flex space-x-2">
-            <button
-              onClick={handleAddNew}
-              className="btn-primary"
-            >
-              Guardar
-            </button>
+          <div className="mt-4 flex justify-end gap-2">
             <button
               onClick={() => setIsAddingNew(false)}
-              className="btn-secondary"
+              className="btn-secondary text-xs"
             >
               Cancelar
+            </button>
+            <button
+              onClick={handleAddNew}
+              className="btn-primary text-xs"
+            >
+              Guardar Tarifa
             </button>
           </div>
         </div>
       )}
 
       {/* Tarjetas de tarifas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredRates.length === 0 && (
-          <div className="col-span-full text-center text-gray-500">No hay tarifas registradas.</div>
+          <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
+            <div className="text-4xl mb-2">🏷️</div>
+            No se encontraron tarifas que coincidan con la búsqueda.
+          </div>
         )}
         {filteredRates.map((rate) => (
-          <div key={rate.id_tarifa} className="card brand-gradient-fill p-4 flex flex-col justify-between text-white">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-lg text-white">
-                    {rate.zona_origen} → {rate.zona_destino}
-                  </span>
-                  {rate.activa ? (
-                    <span className="chip-on-dark-success">Activa</span>
-                  ) : (
-                    <span className="chip-on-dark-danger">Inactiva</span>
-                  )}
+          <div
+            key={rate.id_tarifa}
+            className="item-card group"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <h4 className="item-title">
+                  {rate.zona_origen} → {rate.zona_destino}
+                </h4>
+                {rate.activa ? (
+                  <span className="chip-success shrink-0">Activa</span>
+                ) : (
+                  <span className="chip-danger shrink-0">Inactiva</span>
+                )}
+              </div>
+
+              {/* Price Breakdown Cards */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="item-box">
+                  <div className="item-label">Precio Base</div>
+                  <div className="text-base font-extrabold text-sky-600 dark:text-sky-300 mt-0.5">
+                    {formatCurrency(rate.precio_base)}
+                  </div>
                 </div>
-                <div className="text-white/90 mb-1">
-                  <span className="font-semibold text-white">Precio base:</span> {formatCurrency(rate.precio_base)}
-                </div>
-                <div className="text-white/90 mb-1">
-                  <span className="font-semibold text-white">Precio por KM:</span> {formatCurrency(rate.precio_km)}
-                </div>
-                <div className="text-white/70 text-xs mb-2">
-                  Última actualización: {rate.fecha_actualizacion ? new Date(rate.fecha_actualizacion).toLocaleString('es-CO') : '-'}
+                <div className="item-box">
+                  <div className="item-label">Precio / KM</div>
+                  <div className="text-base font-extrabold text-indigo-600 dark:text-indigo-300 mt-0.5">
+                    {formatCurrency(rate.precio_km)}
+                  </div>
                 </div>
               </div>
-              {isAdmin && (
-                <div className="flex space-x-2 mt-2">
-                  {editingRate?.id_tarifa === rate.id_tarifa ? (
-                    <>
+
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                Actualizado: {rate.fecha_actualizacion ? new Date(rate.fecha_actualizacion).toLocaleDateString('es-CO') : 'Reciente'}
+              </div>
+            </div>
+
+            {isAdmin && (
+              <div className="pt-3 mt-2 border-t border-slate-200 dark:border-white/10">
+                {editingRate?.id_tarifa === rate.id_tarifa ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="number"
+                        value={editedData.precio_base}
+                        onChange={(e) => setEditedData({...editedData, precio_base: e.target.value})}
+                        className="field text-xs"
+                        placeholder="Precio Base"
+                      />
+                      <input
+                        type="number"
+                        value={editedData.precio_km}
+                        onChange={(e) => setEditedData({...editedData, precio_km: e.target.value})}
+                        className="field text-xs"
+                        placeholder="Precio / KM"
+                      />
+                    </div>
+                    <div className="flex gap-2">
                       <button
                         onClick={handleSaveRate}
-                        className="btn-soft px-3 py-1.5 text-sm bg-white/15 text-white border-white/20 hover:bg-white/20 focus:ring-white/30"
+                        className="btn-primary text-xs flex-1 py-1.5"
                       >
                         Guardar
                       </button>
                       <button
                         onClick={() => setEditingRate(null)}
-                        className="btn-soft px-3 py-1.5 text-sm bg-white/10 text-white border-white/20 hover:bg-white/15 focus:ring-white/30"
+                        className="btn-secondary text-xs flex-1 py-1.5"
                       >
                         Cancelar
                       </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleEditRate(rate)}
-                        className="btn-soft px-3 py-1.5 text-sm bg-white/15 text-white border-white/20 hover:bg-white/20 focus:ring-white/30"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDeleteRate(rate.id_tarifa)}
-                        className="btn-soft px-3 py-1.5 text-sm bg-rose-500/20 text-white border-rose-200/30 hover:bg-rose-500/25 focus:ring-white/30"
-                      >
-                        Eliminar
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditRate(rate)}
+                      className="btn-soft text-xs flex-1 py-1.5"
+                    >
+                      ✏️ Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRate(rate.id_tarifa)}
+                      className="btn-soft-rose text-xs flex-1 py-1.5"
+                    >
+                      🗑️ Eliminar
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

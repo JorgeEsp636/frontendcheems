@@ -61,86 +61,112 @@ const RateInfo = ({ rates, onCreateRate, onUpdateRate, onDeleteRate, isAdmin }) 
   };
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Tarifas</h3>
+    <div className="card card-pad">
+      <div className="glass-card-header">
+        <div>
+          <h3 className="card-title text-xl font-bold">
+            <span className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sm">💳</span>
+            Tarifas
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">Configuración tarifaria por trayecto</p>
+        </div>
         {isAdmin && (
-        <button
-          onClick={() => {
-            setEditingRate(null);
-            setFormData({
-              zona_origen: '',
-              zona_destino: '',
-              precio_base: '',
-              precio_km: ''
-            });
-            setShowModal(true);
-          }}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-        >
-          Agregar Tarifa
-        </button>
+          <button
+            onClick={() => {
+              setEditingRate(null);
+              setFormData({
+                zona_origen: '',
+                zona_destino: '',
+                precio_base: '',
+                precio_km: ''
+              });
+              setShowModal(true);
+            }}
+            className="btn-primary"
+          >
+            + Agregar Tarifa
+          </button>
         )}
       </div>
 
-      <div className="border-t border-gray-200">
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            {rates.map((rate) => (
-              <li key={rate.id_tarifa}>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-indigo-600 truncate">
-                    Origen: {rate.zona_origen ? rate.zona_origen : '-'} | Destino: {rate.zona_destino ? rate.zona_destino : '-'}
-                  </p>
-                  <p className="mt-2 flex items-center text-sm text-gray-500">
-                    <span className="truncate">
-                      Precio base: {rate.precio_base ? rate.precio_base : '-'} | Precio/km: {rate.precio_km ? rate.precio_km : '-'}
-                    </span>
-                  </p>
-                  <p className="mt-2 flex items-center text-sm text-gray-500">
-                    <span className="truncate">
-                      Activa: {rate.activa ? 'Sí' : 'No'}
-                    </span>
-                  </p>
-                  <p className="mt-2 flex items-center text-sm text-gray-500">
-                    <span className="truncate">
-                      Última actualización: {rate.fecha_actualizacion ? rate.fecha_actualizacion : '-'}
-                    </span>
-                  </p>
-                </div>
-                {isAdmin && (
-                  <div className="ml-4 flex-shrink-0 flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(rate)}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(rate.id)}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {rates.length === 0 && (
+          <div className="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
+            <div className="text-4xl mb-2">💳</div>
+            No hay tarifas registradas actualmente.
+          </div>
+        )}
+        {rates.map((rate, idx) => (
+          <div
+            key={rate.id_tarifa || rate.id || idx}
+            className="item-card group"
+          >
+            <div className="flex justify-between items-start gap-2 mb-3">
+              <h4 className="item-title">
+                {rate.zona_origen || '-'} → {rate.zona_destino || '-'}
+              </h4>
+              {rate.activa ? (
+                <span className="chip-success shrink-0">Activa</span>
+              ) : (
+                <span className="chip-danger shrink-0">Inactiva</span>
+              )}
+            </div>
+
+            <div className="item-box grid grid-cols-2 gap-2 text-xs mb-3">
+              <div>
+                <span className="item-label block">Precio Base:</span>
+                <span className="font-bold text-sky-600 dark:text-sky-300 text-sm">${rate.precio_base || 0}</span>
+              </div>
+              <div>
+                <span className="item-label block">Precio/KM:</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-300 text-sm">${rate.precio_km || 0}</span>
+              </div>
+            </div>
+
+            {isAdmin && (
+              <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                <button
+                  onClick={() => handleEdit(rate)}
+                  className="btn-soft text-xs flex-1 py-1.5"
+                >
+                  ✏️ Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(rate.id_tarifa || rate.id)}
+                  className="btn-soft-rose text-xs flex-1 py-1.5"
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {showModal && isAdmin && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <>
+          <div className="modal-overlay" aria-hidden="true" onClick={() => setShowModal(false)}></div>
+          <div className="modal-wrap">
+            <div className="modal-sheet">
+              <div className="p-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {editingRate ? 'Editar Tarifa' : 'Nueva Tarifa'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingRate(null);
+                  }}
+                  className="w-8 h-8 rounded-full bg-slate-200/60 dark:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
               <form onSubmit={handleSubmit}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="mb-4">
-                    <label htmlFor="zona_origen" className="block text-sm font-medium text-gray-700">
+                <div className="p-6 space-y-4">
+                  <div>
+                    <label htmlFor="zona_origen" className="field-label">
                       Zona de Origen
                     </label>
                     <input
@@ -149,12 +175,12 @@ const RateInfo = ({ rates, onCreateRate, onUpdateRate, onDeleteRate, isAdmin }) 
                       id="zona_origen"
                       value={formData.zona_origen}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field"
                       required
                     />
                   </div>
-                  <div className="mb-4">
-                    <label htmlFor="zona_destino" className="block text-sm font-medium text-gray-700">
+                  <div>
+                    <label htmlFor="zona_destino" className="field-label">
                       Zona de Destino
                     </label>
                     <input
@@ -163,43 +189,46 @@ const RateInfo = ({ rates, onCreateRate, onUpdateRate, onDeleteRate, isAdmin }) 
                       id="zona_destino"
                       value={formData.zona_destino}
                       onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="field"
                       required
                     />
                   </div>
-                  <div className="mb-4">
-                    <label htmlFor="precio_base" className="block text-sm font-medium text-gray-700">
-                      Precio Base
-                    </label>
-                    <input
-                      type="number"
-                      name="precio_base"
-                      id="precio_base"
-                      value={formData.precio_base}
-                      onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="precio_km" className="block text-sm font-medium text-gray-700">
-                      Precio por Kilómetro
-                    </label>
-                    <input
-                      type="number"
-                      name="precio_km"
-                      id="precio_km"
-                      value={formData.precio_km}
-                      onChange={handleInputChange}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      required
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="precio_base" className="field-label">
+                        Precio Base
+                      </label>
+                      <input
+                        type="number"
+                        name="precio_base"
+                        id="precio_base"
+                        value={formData.precio_base}
+                        onChange={handleInputChange}
+                        className="field"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="precio_km" className="field-label">
+                        Precio por KM
+                      </label>
+                      <input
+                        type="number"
+                        name="precio_km"
+                        id="precio_km"
+                        value={formData.precio_km}
+                        onChange={handleInputChange}
+                        className="field"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+
+                <div className="p-5 sm:px-6 bg-slate-100/70 dark:bg-slate-950/40 border-t border-slate-200 dark:border-white/10 flex flex-row-reverse gap-3">
                   <button
                     type="submit"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="btn-primary flex-1 sm:flex-initial"
                   >
                     {editingRate ? 'Actualizar' : 'Crear'}
                   </button>
@@ -209,7 +238,7 @@ const RateInfo = ({ rates, onCreateRate, onUpdateRate, onDeleteRate, isAdmin }) 
                       setShowModal(false);
                       setEditingRate(null);
                     }}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="btn-secondary flex-1 sm:flex-initial"
                   >
                     Cancelar
                   </button>
@@ -217,7 +246,7 @@ const RateInfo = ({ rates, onCreateRate, onUpdateRate, onDeleteRate, isAdmin }) 
               </form>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
