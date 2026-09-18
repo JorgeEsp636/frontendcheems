@@ -61,127 +61,141 @@ const Login = ({ onLogin, error: propError, registrationSuccess, setRegistration
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-10">
-      {/* Fondo tipo mockup (sin tocar lógica) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B3B57] to-[#061E2C]" />
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.18),_transparent_55%)]" />
-
-      <div className="relative w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center border border-white/15">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-12">
+      <div className="relative w-full max-w-md z-10">
+        {/* Logo / Brand Header */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-sky-500/30 to-indigo-500/30 backdrop-blur-2xl flex items-center justify-center border border-white/25 shadow-[0_0_30px_rgba(56,189,248,0.3)]">
             <svg
               width="34"
               height="34"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="text-white"
+              className="text-sky-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]"
               aria-hidden="true"
             >
               <path
                 d="M12 2.25 20.25 6.9V17.1L12 21.75 3.75 17.1V6.9L12 2.25Z"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M12 2.25V12m0 0 8.25-5.1M12 12 3.75 6.9"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </div>
-          <div className="mt-3 text-white font-semibold tracking-[0.2em]">CHEEMS</div>
+          <h1 className="mt-3 text-2xl font-extrabold tracking-widest brand-gradient-text uppercase">CHEEMS</h1>
+          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase mt-0.5">Sistema de Transporte Inteligente</p>
         </div>
 
-        <div className="rounded-[28px] bg-white/90 backdrop-blur shadow-2xl border border-white/60 overflow-hidden">
-          <div className="p-6 sm:p-7">
-            {/* Tabs (solo navegación) */}
-            <div className="flex items-center justify-center">
-              <div className="inline-flex rounded-full bg-slate-200/70 p-1">
-                <span className="px-4 py-2 rounded-full text-sm font-semibold bg-[#0B3B57] text-white">
-                  Log In
+        {/* Glassmorphic Auth Card */}
+        <div className="rounded-3xl bg-white/85 dark:bg-slate-900/65 backdrop-blur-2xl shadow-glass-lg border border-slate-200/80 dark:border-white/20 overflow-hidden relative">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
+
+          <div className="p-6 sm:p-8">
+            {/* Tabs Selector */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="inline-flex rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-1 shadow-inner backdrop-blur-xl">
+                <span className="px-5 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-[0_2px_12px_rgba(14,165,233,0.35)] border border-white/20">
+                  Iniciar Sesión
                 </span>
                 <Link
                   to="/register"
-                  className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-800"
+                  className="px-5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
                   onClick={() => setRegistrationSuccess?.(false)}
                 >
-                  Sing Up
+                  Registrarse
                 </Link>
               </div>
             </div>
 
-            <h2 className="mt-5 text-center text-lg font-semibold text-slate-800">
-              Bienvenido a CHEEMS
+            <h2 className="text-center text-xl font-bold text-slate-900 dark:text-white mb-2">
+              Bienvenido de nuevo
             </h2>
+            <p className="text-center text-xs text-slate-500 dark:text-slate-400 mb-6">Ingresa tus credenciales para acceder a la plataforma</p>
 
             {registrationSuccess && (
-              <div className="mt-2 text-center text-sm text-green-700">
-                Registro exitoso. Por favor inicia sesión.
+              <div className="mb-4 p-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 text-emerald-700 dark:text-emerald-300 text-xs text-center font-medium shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+                ✓ Registro exitoso. Por favor inicia sesión.
               </div>
             )}
 
-            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="correo_electronico" className="sr-only">Correo</label>
-                <input
-                  id="correo_electronico"
-                  name="correo_electronico"
-                  type="email"
-                  required
-                  className="w-full bg-transparent border-0 border-b border-slate-300 px-1 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#0B3B57]"
-                  placeholder="Correo"
-                  value={formData.correo_electronico}
-                  onChange={handleChange}
-                  autoComplete="email"
-                />
+            {error && (
+              <div className="mb-4 p-3 rounded-2xl bg-rose-500/15 border border-rose-400/40 text-rose-700 dark:text-rose-300 text-xs text-center font-medium shadow-[0_0_15px_rgba(251,113,133,0.2)]">
+                {error}
               </div>
+            )}
 
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="contrasena" className="sr-only">Contraseña</label>
-                <input
-                  id="contrasena"
-                  name="contrasena"
-                  type="password"
-                  required
-                  className="w-full bg-transparent border-0 border-b border-slate-300 px-1 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 focus:border-[#0B3B57]"
-                  placeholder="Contraseña"
-                  value={formData.contrasena}
-                  onChange={handleChange}
-                  autoComplete="current-password"
-                />
-              </div>
-
-              {error && (
-                <div className="text-red-600 text-sm text-center">
-                  {error}
+                <label htmlFor="correo_electronico" className="field-label text-xs uppercase tracking-wider">Correo Electrónico</label>
+                <div className="relative">
+                  <input
+                    id="correo_electronico"
+                    name="correo_electronico"
+                    type="email"
+                    required
+                    className="field"
+                    placeholder="ejemplo@transporte.com"
+                    value={formData.correo_electronico}
+                    onChange={handleChange}
+                    autoComplete="email"
+                  />
                 </div>
-              )}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="contrasena" className="field-label mb-0 text-xs uppercase tracking-wider">Contraseña</label>
+                  <Link to="/forgot-password" className="text-xs text-sky-400 hover:text-sky-300 transition-colors">
+                    ¿La olvidaste?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <input
+                    id="contrasena"
+                    name="contrasena"
+                    type="password"
+                    required
+                    className="field"
+                    placeholder="••••••••"
+                    value={formData.contrasena}
+                    onChange={handleChange}
+                    autoComplete="current-password"
+                  />
+                </div>
+              </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`mt-2 w-full rounded-full py-3 text-sm font-semibold text-white transition ${
-                  loading ? 'bg-[#0B3B57]/60' : 'bg-[#0B3B57] hover:bg-[#083248]'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B3B57]`}
+                className="mt-6 w-full btn-primary py-3 rounded-2xl text-sm font-bold tracking-wide"
               >
-                {loading ? 'Iniciando sesión...' : 'Inicia Sesión'}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                    Validando...
+                  </span>
+                ) : (
+                  'Ingresar al Sistema'
+                )}
               </button>
-
-              <div className="text-center pt-2">
-                <Link to="/forgot-password" className="text-xs text-[#0B3B57] hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
             </form>
           </div>
         </div>
 
-        {/* CTA inferior tipo mockup */}
-        <div className="mt-6 text-center text-sm text-white/90">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="font-semibold underline underline-offset-4">
-            Regístrate
+        {/* Bottom footer text */}
+        <div className="mt-6 text-center text-xs text-slate-400">
+          ¿Aún no tienes una cuenta?{' '}
+          <Link to="/register" className="font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-4">
+            Crear cuenta
           </Link>
         </div>
       </div>

@@ -37,60 +37,104 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Restablecer Contraseña
-          </h2>
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-12">
+      <div className="relative w-full max-w-md z-10">
+        {/* Logo / Brand Header */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-sky-500/30 to-indigo-500/30 backdrop-blur-2xl flex items-center justify-center border border-white/25 shadow-[0_0_30px_rgba(56,189,248,0.3)]">
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-sky-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 2.25 20.25 6.9V17.1L12 21.75 3.75 17.1V6.9L12 2.25Z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 2.25V12m0 0 8.25-5.1M12 12 3.75 6.9"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h1 className="mt-3 text-2xl font-extrabold tracking-widest brand-gradient-text uppercase">CHEEMS</h1>
+          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase mt-0.5">Recuperación de Contraseña</p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">Correo electrónico</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Introduce tu correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+        {/* Glassmorphic Card */}
+        <div className="rounded-3xl bg-white/85 dark:bg-slate-900/65 backdrop-blur-2xl shadow-glass-lg border border-slate-200/80 dark:border-white/20 overflow-hidden relative">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
+
+          <div className="p-6 sm:p-8">
+            <h2 className="text-center text-xl font-bold text-slate-900 dark:text-white mb-2">
+              ¿Olvidaste tu contraseña?
+            </h2>
+            <p className="text-center text-xs text-slate-500 dark:text-slate-400 mb-6">
+              Ingresa el correo asociado a tu cuenta y te enviaremos un enlace de recuperación.
+            </p>
+
+            {message && (
+              <div className="mb-4 p-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 text-emerald-700 dark:text-emerald-300 text-xs text-center font-medium shadow-[0_0_15px_rgba(52,211,153,0.2)]">
+                {message}
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-4 p-3 rounded-2xl bg-rose-500/15 border border-rose-400/40 text-rose-700 dark:text-rose-300 text-xs text-center font-medium shadow-[0_0_15px_rgba(251,113,133,0.2)]">
+                {error}
+              </div>
+            )}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="email" className="field-label text-xs uppercase tracking-wider">Correo Electrónico</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="field"
+                  placeholder="ejemplo@transporte.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="mt-6 w-full btn-primary py-3 rounded-2xl text-sm font-bold tracking-wide"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                    Enviando enlace...
+                  </span>
+                ) : (
+                  'Enviar enlace de restablecimiento'
+                )}
+              </button>
+            </form>
           </div>
+        </div>
 
-          {message && (
-            <div className="text-green-500 text-sm text-center">
-              {message}
-            </div>
-          )}
-
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Enviando...' : 'Enviar enlace de restablecimiento'}
-            </button>
-          </div>
-
-          <div className="text-sm text-center">
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Volver al inicio de sesión
-            </Link>
-          </div>
-        </form>
+        {/* Bottom link */}
+        <div className="mt-6 text-center text-xs text-slate-400">
+          <Link to="/login" className="font-semibold text-sky-400 hover:text-sky-300 underline underline-offset-4 flex items-center justify-center gap-1">
+            ← Volver al inicio de sesión
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -18,31 +18,33 @@ const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+    <div className="max-w-md mx-auto p-6 sm:p-8 rounded-3xl bg-white/85 dark:bg-slate-900/65 backdrop-blur-2xl border border-slate-200/80 dark:border-white/20 shadow-glass-lg text-slate-800 dark:text-slate-100">
+      <h2 className="text-xl font-bold mb-6 text-center text-slate-900 dark:text-white">Iniciar Sesión</h2>
       {error && (
-        <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-3 bg-rose-500/15 border border-rose-400/40 text-rose-700 dark:text-rose-300 rounded-2xl text-xs text-center font-medium shadow-[0_0_12px_rgba(251,113,133,0.2)]">
           {error}
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="field-label text-xs uppercase tracking-wider">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+            className="field"
+            placeholder="ejemplo@transporte.com"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+          <label className="field-label text-xs uppercase tracking-wider">Contraseña</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black"
+            className="field"
+            placeholder="••••••••"
             required
           />
         </div>
@@ -50,14 +52,14 @@ const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
           <button
             type="button"
             onClick={onForgotPassword}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
           >
             ¿Olvidaste tu contraseña?
           </button>
         </div>
         <button
           type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          className="w-full btn-primary py-3 rounded-2xl text-sm font-bold"
         >
           Ingresar
         </button>
@@ -65,7 +67,7 @@ const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
           <button
             type="button"
             onClick={onRegister}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-xs text-sky-400 hover:text-sky-300 underline underline-offset-4"
           >
             ¿No tienes cuenta? Regístrate
           </button>
@@ -76,5 +78,3 @@ const AuthLoginForm = ({ onLogin, onForgotPassword, onRegister }) => {
 };
 
 export default AuthLoginForm;
-
-// DONE

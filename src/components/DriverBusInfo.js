@@ -32,18 +32,48 @@ const DriverBusInfo = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-center">Conductores y Buses</h2>
+    <div className="card card-pad">
+      <div className="glass-card-header">
+        <div>
+          <h2 className="card-title text-xl font-bold">
+            <span className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sm">🚌</span>
+            Asignación de Conductores y Buses
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">Relación operativa de unidades y operadores asignados</p>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {driverBusData.map((item, index) => (
-          <div key={index} className="border border-gray-200 rounded-lg p-4 shadow-sm">
-            <h3 className="text-xl font-semibold mb-2">Conductor: {item.driverName}</h3>
-            <div className="space-y-1 text-gray-600">
-              <p><span className="font-medium">Número de Bus:</span> {item.busInfo.number}</p>
-              <p><span className="font-medium">Modelo:</span> {item.busInfo.model}</p>
-              <p><span className="font-medium">Placa:</span> {item.busInfo.plate}</p>
-              <p><span className="font-medium">Capacidad:</span> {item.busInfo.capacity} pasajeros</p>
+          <div
+            key={index}
+            className="item-card group"
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-300/30 dark:border-white/20 flex items-center justify-center font-bold text-sky-600 dark:text-sky-300 shadow-sm">
+                  {item.driverName.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="item-title">{item.driverName}</h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{item.busInfo.number}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2 item-box text-xs">
+                <div className="flex justify-between">
+                  <span className="item-label">Modelo:</span>
+                  <span className="item-value">{item.busInfo.model}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="item-label">Placa:</span>
+                  <span className="font-bold text-sky-600 dark:text-sky-300 font-mono">{item.busInfo.plate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="item-label">Capacidad:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{item.busInfo.capacity} pasajeros</span>
+                </div>
+              </div>
             </div>
           </div>
         ))}
